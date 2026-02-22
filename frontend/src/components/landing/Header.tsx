@@ -6,9 +6,8 @@ import Image from "next/image";
 import logo from "../../../public/logo1.png";
 
 const navLinks = [
-  { href: "#features", label: "Features" },
+  { href: "/features", label: "Features" },
   { href: "#pricing", label: "Pricing" },
-  { href: "#about", label: "About" },
   { href: "#contact", label: "Contact" },
   { href: "/login", label: "Login" },
 ];
