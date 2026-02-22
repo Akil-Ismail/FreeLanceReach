@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import logo from "../../../public/logo1.png";
+import Header from "@/components/landing/Header";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -18,22 +17,17 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-block">
-            <Image
-              src={logo}
-              alt="FreelanceReach"
-              className="h-16 w-auto mx-auto"
-            />
-          </Link>
-          <h1 className="mt-6 text-3xl font-bold text-gray-900">
-            Welcome Back
-          </h1>
-          <p className="mt-2 text-gray-600">Sign in to your account</p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <Header />
+      <div className="flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md">
+          {/* Page Title */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">
+              Welcome Back
+            </h1>
+            <p className="mt-2 text-gray-600">Sign in to your account</p>
+          </div>
 
         {/* Login Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
@@ -173,6 +167,7 @@ export default function LoginPage() {
             </Link>
           </p>
         </div>
+      </div>
       </div>
     </div>
   );

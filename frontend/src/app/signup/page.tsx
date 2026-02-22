@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import logo from "../../../public/logo1.png";
+import Header from "@/components/landing/Header";
 
 const freelanceCategories = [
   "Software Engineer",
@@ -65,24 +64,19 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4">
-      <div className="max-w-2xl mx-auto">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-block">
-            <Image
-              src={logo}
-              alt="FreelanceReach"
-              className="h-16 w-auto mx-auto"
-            />
-          </Link>
-          <h1 className="mt-6 text-3xl font-bold text-gray-900">
-            Join as a Freelancer
-          </h1>
-          <p className="mt-2 text-gray-600">
-            Start landing your dream clients today
-          </p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <Header />
+      <div className="py-12 px-4">
+        <div className="max-w-2xl mx-auto">
+          {/* Page Title */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">
+              Join as a Freelancer
+            </h1>
+            <p className="mt-2 text-gray-600">
+              Start landing your dream clients today
+            </p>
+          </div>
 
         {/* Signup Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
@@ -381,6 +375,7 @@ export default function SignupPage() {
               Sign in
             </Link>
           </p>
+        </div>
         </div>
       </div>
     </div>
