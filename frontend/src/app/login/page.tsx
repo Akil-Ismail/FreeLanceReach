@@ -1,19 +1,42 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/landing/Header";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    userType: "freelancer", // freelancer or company
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login:", formData);
+    setIsLoading(true);
+    setError("");
+
+    try {
+      // Simulate API call delay
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
+      // For testing: Accept any credentials and set the selected role
+      // In production: Replace with actual API call to backend
+      localStorage.setItem("userRole", formData.userType);
+
+      // Redirect to AI Proposal Generator
+      router.push("/ai-proposal-generator");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Login failed. Please try again.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -27,9 +50,79 @@ export default function LoginPage() {
             <p className="mt-2 text-gray-600">Sign in to your account</p>
           </div>
 
+          {/* Test Credentials Banner */}
+          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <p className="text-xs font-semibold text-blue-900 mb-2">
+              🧪 Testing Mode (No Backend)
+            </p>
+            <p className="text-xs text-blue-800 mb-3">
+              Use any email and password to test:
+            </p>
+            <div className="space-y-2">
+              <div className="bg-white p-2 rounded border border-blue-100">
+                <p className="text-xs font-mono text-gray-700">
+                  <strong>Freelancer:</strong> freelancer@test.com / password123
+                </p>
+              </div>
+              <div className="bg-white p-2 rounded border border-blue-100">
+                <p className="text-xs font-mono text-gray-700">
+                  <strong>Company:</strong> company@test.com / password123
+                </p>
+              </div>
+            </div>
+            <p className="text-xs text-blue-700 mt-2">
+              Or use any email/password combination
+            </p>
+          </div>
+
           {/* Login Form */}
           <div className="bg-white rounded-2xl shadow-xl p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Error Message */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                  {error}
+                </div>
+              )}
+
+              {/* Account Type */}
+              <div>
+                <label
+                  htmlFor="userType"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  I am logging in as:
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setFormData({ ...formData, userType: "freelancer" })
+                    }
+                    className={`px-4 py-3 rounded-lg border-2 font-semibold transition-all ${
+                      formData.userType === "freelancer"
+                        ? "border-red-600 bg-red-50 text-red-600"
+                        : "border-gray-300 text-gray-700 hover:border-gray-400"
+                    }`}
+                  >
+                    💼 Freelancer
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setFormData({ ...formData, userType: "company" })
+                    }
+                    className={`px-4 py-3 rounded-lg border-2 font-semibold transition-all ${
+                      formData.userType === "company"
+                        ? "border-red-600 bg-red-50 text-red-600"
+                        : "border-gray-300 text-gray-700 hover:border-gray-400"
+                    }`}
+                  >
+                    🏢 Company
+                  </button>
+                </div>
+              </div>
+
               {/* Email */}
               <div>
                 <label
@@ -40,14 +133,14 @@ export default function LoginPage() {
                 </label>
                 <input
                   id="email"
-                  type="email"
-                  required
+                  type="text"
+                  disabled={isLoading}
                   value={formData.email}
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
-                  placeholder="you@example.com"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all disabled:bg-gray-50 disabled:cursor-not-allowed"
+                  placeholder="test@example.com (or anything)"
                 />
               </div>
 
@@ -62,13 +155,13 @@ export default function LoginPage() {
                 <input
                   id="password"
                   type="password"
-                  required
+                  disabled={isLoading}
                   value={formData.password}
                   onChange={(e) =>
                     setFormData({ ...formData, password: e.target.value })
                   }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
-                  placeholder="••••••••"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all disabled:bg-gray-50 disabled:cursor-not-allowed"
+                  placeholder="anything works"
                 />
               </div>
 
@@ -77,7 +170,8 @@ export default function LoginPage() {
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                    disabled={isLoading}
+                    className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500 disabled:cursor-not-allowed"
                   />
                   <span className="ml-2 text-sm text-gray-600">
                     Remember me
@@ -94,9 +188,10 @@ export default function LoginPage() {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                disabled={isLoading}
+                className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:transform-none"
               >
-                Sign In
+                {isLoading ? "Signing in..." : "Sign In"}
               </button>
             </form>
 

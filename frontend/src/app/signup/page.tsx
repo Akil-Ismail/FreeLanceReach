@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/landing/Header";
 
@@ -35,6 +36,7 @@ const freelanceCategories = [
 ];
 
 export default function SignupPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -46,6 +48,8 @@ export default function SignupPage() {
     bio: "",
     cv: null as File | null,
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -53,14 +57,36 @@ export default function SignupPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords don't match!");
-      return;
+    setError("");
+    setIsLoading(true);
+
+    try {
+      if (formData.password !== formData.confirmPassword) {
+        throw new Error("Passwords don't match!");
+      }
+
+      // TODO: Replace with actual API call to backend
+      // const response = await fetch('/api/auth/signup/freelancer', {
+      //   method: 'POST',
+      //   body: new FormData(). append all form data..,
+      // });
+      // const data = await response.json();
+      // if (!response.ok) throw new Error(data.message);
+
+      // For now: Simulate successful signup and auto-login as freelancer
+      localStorage.setItem("userRole", "freelancer");
+
+      // Redirect to AI Proposal Generator
+      router.push("/ai-proposal-generator");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Signup failed. Please try again.",
+      );
+    } finally {
+      setIsLoading(false);
     }
-    // Handle signup logic here
-    console.log("Signup:", formData);
   };
 
   return (
@@ -80,7 +106,25 @@ export default function SignupPage() {
 
           {/* Signup Form */}
           <div className="bg-white rounded-2xl shadow-xl p-8">
+            {/* Test Credentials Banner */}
+            <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p className="text-xs font-semibold text-blue-900 mb-2">
+                🧪 Testing Mode (No Backend)
+              </p>
+              <p className="text-xs text-blue-800">
+                Use any information you want - everything will be accepted for
+                testing purposes
+              </p>
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Error Message */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                  {error}
+                </div>
+              )}
+
               {/* Name Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -93,7 +137,7 @@ export default function SignupPage() {
                   <input
                     id="firstName"
                     type="text"
-                    required
+                    disabled={isLoading}
                     value={formData.firstName}
                     onChange={(e) =>
                       setFormData({ ...formData, firstName: e.target.value })
@@ -112,7 +156,7 @@ export default function SignupPage() {
                   <input
                     id="lastName"
                     type="text"
-                    required
+                    disabled={isLoading}
                     value={formData.lastName}
                     onChange={(e) =>
                       setFormData({ ...formData, lastName: e.target.value })
@@ -133,8 +177,8 @@ export default function SignupPage() {
                 </label>
                 <input
                   id="email"
-                  type="email"
-                  required
+                  type="text"
+                  disabled={isLoading}
                   value={formData.email}
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
@@ -155,7 +199,7 @@ export default function SignupPage() {
                 <input
                   id="phone"
                   type="tel"
-                  required
+                  disabled={isLoading}
                   value={formData.phone}
                   onChange={(e) =>
                     setFormData({ ...formData, phone: e.target.value })
@@ -346,9 +390,12 @@ export default function SignupPage() {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                disabled={isLoading}
+                className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:transform-none"
               >
-                Create Freelancer Account
+                {isLoading
+                  ? "Creating Account..."
+                  : "Create Freelancer Account"}
               </button>
             </form>
 
