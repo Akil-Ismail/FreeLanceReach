@@ -3,6 +3,9 @@
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
+// Authentication
+Route::post('/login', [UserController::class, 'login']);
+
 // User CRUD routes
 Route::get('/users', [UserController::class, 'index']);
 Route::get('/users/role/{role}', [UserController::class, 'getByRole']);

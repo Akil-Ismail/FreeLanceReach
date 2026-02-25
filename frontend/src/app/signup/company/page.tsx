@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/landing/Header";
+import api from "@/lib/api";
 
 const companySizes = [
   "1-10 employees",
@@ -62,24 +63,49 @@ export default function CompanySignupPage() {
         throw new Error("Passwords don't match!");
       }
 
-      // TODO: Replace with actual API call to backend
-      // const response = await fetch('/api/auth/signup/company', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData),
-      // });
-      // const data = await response.json();
-      // if (!response.ok) throw new Error(data.message);
+      const response = await api.post("/register/company", {
+        company_name: formData.companyName,
+        contact_first_name: formData.contactFirstName,
+        contact_last_name: formData.contactLastName,
+        work_email: formData.email,
+        email: formData.email,
+        phone_number: formData.phone,
+        company_website: formData.companyWebsite,
+        company_size: formData.companySize,
+        industry: formData.industry,
+        company_description: formData.description,
+        password: formData.password,
+        password_confirmation: formData.confirmPassword,
+      });
 
-      // For now: Simulate successful signup and auto-login as company
+      // Store auth info
+      if (response.data.token) {
+        localStorage.setItem("authToken", response.data.token);
+      }
       localStorage.setItem("userRole", "company");
 
       // Redirect to AI Proposal Generator (or company dashboard)
       router.push("/ai-proposal-generator");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Signup failed. Please try again.",
-      );
+      const error = err as {
+        response?: {
+          data?: { message?: string; errors?: Record<string, string[]> };
+        };
+        message?: string;
+      };
+      let errorMessage = "Signup failed. Please try again.";
+
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.data?.errors) {
+        errorMessage = Object.values(error.response.data.errors)
+          .flat()
+          .join(", ");
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -102,17 +128,6 @@ export default function CompanySignupPage() {
 
           {/* Signup Form */}
           <div className="bg-white rounded-2xl shadow-xl p-8">
-            {/* Test Credentials Banner */}
-            <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-xs font-semibold text-blue-900 mb-2">
-                🧪 Testing Mode (No Backend)
-              </p>
-              <p className="text-xs text-blue-800">
-                Use any information you want - everything will be accepted for
-                testing purposes
-              </p>
-            </div>
-
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Error Message */}
               {error && (

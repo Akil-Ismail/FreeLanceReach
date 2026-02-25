@@ -3,14 +3,43 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Http\Requests\StoreCompanyRequest;
-use App\Http\Requests\StoreFreelancerRequest;
-use App\Http\Requests\UpdateUserRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
+    // Login user
+    public function login(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'message' => 'Invalid credentials'
+            ], 401);
+        }
+
+        return response()->json([
+            'message' => 'Login successful',
+            'user' => $user
+        ]);
+    }
+
     // Get all users
     public function index(): JsonResponse
     {
@@ -32,9 +61,30 @@ class UserController extends Controller
     }
 
     // Register company
-    public function registerCompany(StoreCompanyRequest $request): JsonResponse
+    public function registerCompany(Request $request): JsonResponse
     {
-        $data = $request->validated();
+        $validator = Validator::make($request->all(), [
+            'company_name' => 'required|string|max:255',
+            'contact_first_name' => 'required|string|max:255',
+            'contact_last_name' => 'required|string|max:255',
+            'work_email' => 'required|email|unique:users,work_email',
+            'email' => 'required|email|unique:users,email',
+            'phone_number' => 'required|string|max:20',
+            'company_website' => 'nullable|url',
+            'company_size' => 'required|string',
+            'industry' => 'required|string',
+            'company_description' => 'required|string|min:20',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $data = $validator->validated();
         $data['role'] = 'company';
 
         $user = User::create($data);
@@ -46,9 +96,27 @@ class UserController extends Controller
     }
 
     // Register freelancer
-    public function registerFreelancer(StoreFreelancerRequest $request): JsonResponse
+    public function registerFreelancer(Request $request): JsonResponse
     {
-        $data = $request->validated();
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'phone_number' => 'required|string|max:20',
+            'freelance_category' => 'required|string',
+            'professional_bio' => 'required|string|min:50',
+            'cv' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $data = $validator->validated();
         $data['role'] = 'freelancer';
 
         // Handle CV upload
@@ -66,9 +134,24 @@ class UserController extends Controller
     }
 
     // Update user
-    public function update(UpdateUserRequest $request, User $user): JsonResponse
+    public function update(Request $request, User $user): JsonResponse
     {
-        $user->update($request->validated());
+        $user->update($request->only([
+            'email',
+            'phone_number',
+            'company_name',
+            'contact_first_name',
+            'contact_last_name',
+            'work_email',
+            'company_website',
+            'company_size',
+            'industry',
+            'company_description',
+            'first_name',
+            'last_name',
+            'freelance_category',
+            'professional_bio'
+        ]));
 
         return response()->json([
             'message' => 'User updated successfully',

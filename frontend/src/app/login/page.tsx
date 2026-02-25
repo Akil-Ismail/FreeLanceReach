@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/landing/Header";
+import api from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,18 +22,29 @@ export default function LoginPage() {
     setError("");
 
     try {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      const response = await api.post("/login", {
+        email: formData.email,
+        password: formData.password,
+      });
 
-      // For testing: Accept any credentials and set the selected role
-      // In production: Replace with actual API call to backend
-      localStorage.setItem("userRole", formData.userType);
+      // Store auth token and user role from response
+      if (response.data.token) {
+        localStorage.setItem("authToken", response.data.token);
+      }
+      const userRole = response.data.user?.role || formData.userType;
+      localStorage.setItem("userRole", userRole);
 
       // Redirect to AI Proposal Generator
       router.push("/ai-proposal-generator");
     } catch (err) {
+      const error = err as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
       setError(
-        err instanceof Error ? err.message : "Login failed. Please try again.",
+        error.response?.data?.message ||
+          error.message ||
+          "Login failed. Please try again.",
       );
     } finally {
       setIsLoading(false);
@@ -48,31 +60,6 @@ export default function LoginPage() {
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
             <p className="mt-2 text-gray-600">Sign in to your account</p>
-          </div>
-
-          {/* Test Credentials Banner */}
-          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-xs font-semibold text-blue-900 mb-2">
-              🧪 Testing Mode (No Backend)
-            </p>
-            <p className="text-xs text-blue-800 mb-3">
-              Use any email and password to test:
-            </p>
-            <div className="space-y-2">
-              <div className="bg-white p-2 rounded border border-blue-100">
-                <p className="text-xs font-mono text-gray-700">
-                  <strong>Freelancer:</strong> freelancer@test.com / password123
-                </p>
-              </div>
-              <div className="bg-white p-2 rounded border border-blue-100">
-                <p className="text-xs font-mono text-gray-700">
-                  <strong>Company:</strong> company@test.com / password123
-                </p>
-              </div>
-            </div>
-            <p className="text-xs text-blue-700 mt-2">
-              Or use any email/password combination
-            </p>
           </div>
 
           {/* Login Form */}
@@ -123,7 +110,6 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* Email */}
               <div>
                 <label
                   htmlFor="email"
@@ -133,14 +119,15 @@ export default function LoginPage() {
                 </label>
                 <input
                   id="email"
-                  type="text"
+                  type="email"
+                  required
                   disabled={isLoading}
                   value={formData.email}
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all disabled:bg-gray-50 disabled:cursor-not-allowed"
-                  placeholder="test@example.com (or anything)"
+                  placeholder="you@example.com"
                 />
               </div>
 
@@ -155,13 +142,14 @@ export default function LoginPage() {
                 <input
                   id="password"
                   type="password"
+                  required
                   disabled={isLoading}
                   value={formData.password}
                   onChange={(e) =>
                     setFormData({ ...formData, password: e.target.value })
                   }
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all disabled:bg-gray-50 disabled:cursor-not-allowed"
-                  placeholder="anything works"
+                  placeholder="••••••••"
                 />
               </div>
 

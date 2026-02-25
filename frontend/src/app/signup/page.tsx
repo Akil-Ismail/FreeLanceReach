@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/landing/Header";
+import api from "@/lib/api";
 
 const freelanceCategories = [
   "Software Engineer",
@@ -67,23 +68,55 @@ export default function SignupPage() {
         throw new Error("Passwords don't match!");
       }
 
-      // TODO: Replace with actual API call to backend
-      // const response = await fetch('/api/auth/signup/freelancer', {
-      //   method: 'POST',
-      //   body: new FormData(). append all form data..,
-      // });
-      // const data = await response.json();
-      // if (!response.ok) throw new Error(data.message);
+      // Prepare form data for multipart upload
+      const submitData = new FormData();
+      submitData.append("first_name", formData.firstName);
+      submitData.append("last_name", formData.lastName);
+      submitData.append("email", formData.email);
+      submitData.append("phone_number", formData.phone);
+      submitData.append("freelance_category", formData.category);
+      submitData.append("professional_bio", formData.bio);
+      submitData.append("password", formData.password);
+      submitData.append("password_confirmation", formData.confirmPassword);
 
-      // For now: Simulate successful signup and auto-login as freelancer
+      if (formData.cv) {
+        submitData.append("cv", formData.cv);
+      }
+
+      const response = await api.post("/register/freelancer", submitData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      // Store auth info
+      if (response.data.token) {
+        localStorage.setItem("authToken", response.data.token);
+      }
       localStorage.setItem("userRole", "freelancer");
 
       // Redirect to AI Proposal Generator
       router.push("/ai-proposal-generator");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Signup failed. Please try again.",
-      );
+      const error = err as {
+        response?: {
+          data?: { message?: string; errors?: Record<string, string[]> };
+        };
+        message?: string;
+      };
+      let errorMessage = "Signup failed. Please try again.";
+
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.data?.errors) {
+        errorMessage = Object.values(error.response.data.errors)
+          .flat()
+          .join(", ");
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -106,17 +139,6 @@ export default function SignupPage() {
 
           {/* Signup Form */}
           <div className="bg-white rounded-2xl shadow-xl p-8">
-            {/* Test Credentials Banner */}
-            <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-xs font-semibold text-blue-900 mb-2">
-                🧪 Testing Mode (No Backend)
-              </p>
-              <p className="text-xs text-blue-800">
-                Use any information you want - everything will be accepted for
-                testing purposes
-              </p>
-            </div>
-
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Error Message */}
               {error && (
