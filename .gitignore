@@ -18,8 +18,6 @@ backend/laravel/vendor/
 backend/laravel/node_modules/
 backend/laravel/my-laravel-app/vendor/
 backend/laravel/my-laravel-app/node_modules/
-backend/laravel/my-laravel-app/bootstrap/cache/
-backend/laravel/my-laravel-app/composer.lock
 
 # Next.js
 .next/
@@ -42,6 +40,27 @@ frontend/dist/
 frontend/.env*
 backend/fastapi/.env
 backend/laravel/.env
+backend/laravel/my-laravel-app/.env
+
+# Laravel specific
+backend/laravel/my-laravel-app/storage/*.key
+backend/laravel/my-laravel-app/storage/app/*
+!backend/laravel/my-laravel-app/storage/app/.gitignore
+backend/laravel/my-laravel-app/storage/framework/*
+!backend/laravel/my-laravel-app/storage/framework/.gitignore
+backend/laravel/my-laravel-app/storage/logs/*
+!backend/laravel/my-laravel-app/storage/logs/.gitignore
+backend/laravel/my-laravel-app/bootstrap/cache/*
+!backend/laravel/my-laravel-app/bootstrap/cache/.gitignore
+backend/laravel/my-laravel-app/public/storage
+backend/laravel/my-laravel-app/public/hot
+backend/laravel/my-laravel-app/.phpunit.result.cache
+backend/laravel/my-laravel-app/Homestead.json
+backend/laravel/my-laravel-app/Homestead.yaml
+backend/laravel/my-laravel-app/npm-debug.log
+backend/laravel/my-laravel-app/yarn-error.log
+backend/laravel/my-laravel-app/.env.backup
+backend/laravel/my-laravel-app/composer.lock
 
 # Debug logs
 npm-debug.log*

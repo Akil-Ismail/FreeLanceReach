@@ -1,15 +1,13 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-// Define API routes here
-
-Route::middleware('api')->group(function () {
-    // Example route
-    Route::get('/users', 'UserController@index');
-    Route::post('/users', 'UserController@store');
-    Route::get('/users/{id}', 'UserController@show');
-    Route::put('/users/{id}', 'UserController@update');
-    Route::delete('/users/{id}', 'UserController@destroy');
-});
+// User CRUD routes
+Route::get('/users', [UserController::class, 'index']);
+Route::get('/users/role/{role}', [UserController::class, 'getByRole']);
+Route::get('/users/{user}', [UserController::class, 'show']);
+Route::post('/register/company', [UserController::class, 'registerCompany']);
+Route::post('/register/freelancer', [UserController::class, 'registerFreelancer']);
+Route::put('/users/{user}', [UserController::class, 'update']);
+Route::delete('/users/{user}', [UserController::class, 'destroy']);
