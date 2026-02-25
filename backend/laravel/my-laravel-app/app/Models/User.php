@@ -36,9 +36,15 @@ class User extends Authenticatable
         'password',
     ];
 
-    protected $casts = [
-        'password' => 'hashed',
-    ];
+    protected $casts = [];
+
+    /**
+     * Hash password automatically when setting it.
+     */
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = bcrypt($value);
+    }
 
     public function isCompany(): bool
     {
