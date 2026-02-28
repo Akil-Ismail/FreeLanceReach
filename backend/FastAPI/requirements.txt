@@ -1,0 +1,28 @@
+# FastAPI Framework
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+
+# Qdrant - Vector Database (Python 3.14 compatible)
+qdrant-client>=1.17.0
+
+# Pydantic for data validation
+pydantic>=2.6.0
+pydantic-settings>=2.1.0
+
+# CORS middleware
+python-multipart>=0.0.9
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# HTTP client
+httpx>=0.26.0
+
+# Google Gemini AI
+google-generativeai>=0.7.0
+
+# Optional: OpenAI for AI features
+# openai>=1.12.0
+
+# Optional: Sentence Transformers for embeddings
+# sentence-transformers>=2.3.0
