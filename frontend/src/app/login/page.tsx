@@ -11,7 +11,6 @@ export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    userType: "freelancer", // freelancer or company
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -31,8 +30,10 @@ export default function LoginPage() {
       if (response.data.token) {
         localStorage.setItem("authToken", response.data.token);
       }
-      const userRole = response.data.user?.role || formData.userType;
+      const userRole = response.data.user?.role || null; // Default to null if role is not provided
       localStorage.setItem("userRole", userRole);
+      const userEmail = response.data.user?.email || null; // Default to null if email is not provided
+      localStorage.setItem("userEmail", userEmail);
 
       // Redirect to AI Proposal Generator
       router.push("/ai-proposal-generator");
@@ -59,7 +60,7 @@ export default function LoginPage() {
           {/* Page Title */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
-            <p className="mt-2 text-gray-600">Sign in to your account</p>
+            {/* <p className="mt-2 text-gray-600">Sign in to your account</p> */}
           </div>
 
           {/* Login Form */}
@@ -73,7 +74,7 @@ export default function LoginPage() {
               )}
 
               {/* Account Type */}
-              <div>
+              {/* <div>
                 <label
                   htmlFor="userType"
                   className="block text-sm font-medium text-gray-700 mb-2"
@@ -108,7 +109,7 @@ export default function LoginPage() {
                     🏢 Company
                   </button>
                 </div>
-              </div>
+              </div> */}
 
               <div>
                 <label
