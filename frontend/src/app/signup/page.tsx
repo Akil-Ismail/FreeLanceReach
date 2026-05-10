@@ -83,11 +83,7 @@ export default function SignupPage() {
         submitData.append("cv", formData.cv);
       }
 
-      const response = await api.post("/register/freelancer", submitData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await api.post("/register/freelancer", submitData);
 
       // Store auth info
       if (response.data.token) {
@@ -288,7 +284,7 @@ export default function SignupPage() {
                   placeholder="Tell us about your skills and experience..."
                 />
                 <p className="mt-1 text-sm text-gray-500">
-                  Minimum 50 characters
+                  Minimum 10 characters
                 </p>
               </div>
 

@@ -110,7 +110,7 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email',
             'phone_number' => 'required|string|max:20',
             'freelance_category' => 'required|string',
-            'professional_bio' => 'required|string|min:50',
+            'professional_bio' => 'required|string|min:10',
             'cv' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
             'password' => 'required|string|min:8|confirmed',
         ]);
@@ -125,17 +125,36 @@ class UserController extends Controller
         $data = $validator->validated();
         $data['role'] = 'freelancer';
 
-        // Handle CV upload
+        // Handle CV upload before removing the file from $data
+        $cvPath = null;
         if ($request->hasFile('cv')) {
-            $path = $request->file('cv')->store('cvs', 'public');
-            $data['cv_path'] = $path;
+            $original = $request->file('cv')->getClientOriginalName();
+            $cvPath = $request->file('cv')->storeAs('cvs', 'tmp_' . $original, 'public');
         }
+
+        // Remove the UploadedFile object — not a DB column
+        unset($data['cv']);
 
         $user = User::create($data);
 
+        // Rename CV to include real user ID now that we have it
+        if ($cvPath) {
+            $original = basename($cvPath);
+            $newPath = 'cvs/' . $user->id . '_' . ltrim($original, 'tmp_');
+            Storage::disk('public')->move($cvPath, $newPath);
+            $user->cv_path = $newPath;
+            $user->save();
+        }
+
+        // Generate auth token so the user can immediately call protected routes
+        $plainToken = Str::random(60);
+        $user->api_token = hash('sha256', $plainToken);
+        $user->save();
+
         return response()->json([
             'message' => 'Freelancer registered successfully',
-            'user' => $user
+            'token' => $plainToken,
+            'user' => $user,
         ], 201);
     }
 
@@ -200,7 +219,10 @@ class UserController extends Controller
         }
 
         $filename = basename($user->cv_path);
-        return Storage::disk('public')->download($user->cv_path, $filename);
+        $fullPath = storage_path('app/public/' . $user->cv_path);
+        return response()->file($fullPath, [
+            'Content-Disposition' => 'inline; filename="' . $filename . '"',
+        ]);
     }
 
     // Delete user

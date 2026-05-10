@@ -105,9 +105,7 @@ export default function HomeProfilePage() {
     try {
       const fd = new FormData();
       fd.append("cv", file);
-      await api.post(`/users/${userId}/cv`, fd, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await api.post(`/users/${userId}/cv`, fd);
       setHasCv(true);
       setCvName(file.name);
     } finally {
