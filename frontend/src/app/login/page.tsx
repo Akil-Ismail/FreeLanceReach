@@ -34,9 +34,29 @@ export default function LoginPage() {
       localStorage.setItem("userRole", userRole);
       const userEmail = response.data.user?.email || null; // Default to null if email is not provided
       localStorage.setItem("userEmail", userEmail);
+      const userId = response.data.user?.id || null;
+      if (userId) {
+        localStorage.setItem("userId", String(userId));
+        localStorage.setItem(
+          `user:profile:${userId}`,
+          JSON.stringify({
+            value: response.data.user,
+            savedAt: Date.now(),
+          }),
+        );
+      }
 
-      // Redirect to AI Proposal Generator
-      router.push("/ai-proposal-generator");
+      const setupComplete = userId
+        ? localStorage.getItem(`profileSetupComplete:${userId}`) === "true"
+        : false;
+
+      if (!setupComplete) {
+        router.push("/home/setup");
+      } else {
+        router.push(
+          userRole === "company" ? "/home/employer" : "/home/freelancer",
+        );
+      }
     } catch (err) {
       const error = err as {
         response?: { data?: { message?: string } };

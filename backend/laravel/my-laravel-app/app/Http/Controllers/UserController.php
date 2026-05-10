@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -34,9 +35,14 @@ class UserController extends Controller
             ], 401);
         }
 
+        $plainToken = Str::random(60);
+        $user->api_token = hash('sha256', $plainToken);
+        $user->save();
+
         return response()->json([
             'message' => 'Login successful',
-            'user' => $user
+            'token' => $plainToken,
+            'user' => $user,
         ]);
     }
 
@@ -157,6 +163,44 @@ class UserController extends Controller
             'message' => 'User updated successfully',
             'user' => $user
         ]);
+    }
+
+    // Upload CV for a freelancer
+    public function uploadCv(Request $request, User $user): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'cv' => 'required|file|mimes:pdf,doc,docx|max:10240',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
+        }
+
+        if ($user->cv_path) {
+            Storage::disk('public')->delete($user->cv_path);
+        }
+
+        $original = $request->file('cv')->getClientOriginalName();
+        $path = $request->file('cv')->storeAs('cvs', $user->id . '_' . $original, 'public');
+        $user->cv_path = $path;
+        $user->save();
+
+        return response()->json([
+            'message' => 'CV uploaded successfully',
+            'has_cv'  => true,
+            'cv_name' => $original,
+        ]);
+    }
+
+    // Download/view CV (public — no auth required so employer can open it directly)
+    public function downloadCv(User $user)
+    {
+        if (!$user->cv_path || !Storage::disk('public')->exists($user->cv_path)) {
+            return response()->json(['message' => 'No CV found'], 404);
+        }
+
+        $filename = basename($user->cv_path);
+        return Storage::disk('public')->download($user->cv_path, $filename);
     }
 
     // Delete user

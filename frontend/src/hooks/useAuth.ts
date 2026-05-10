@@ -21,7 +21,16 @@ export const useAuth = () => {
   }, [router]);
 
   const logout = () => {
+    const userId = localStorage.getItem("userId");
     localStorage.removeItem("userRole");
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userEmail");
+    if (userId) {
+      localStorage.removeItem(`user:profile:${userId}`);
+      localStorage.removeItem(`freelancer:offers:${userId}`);
+      localStorage.removeItem(`employer:suggested_freelancers:${userId}`);
+    }
     router.push("/login");
   };
 

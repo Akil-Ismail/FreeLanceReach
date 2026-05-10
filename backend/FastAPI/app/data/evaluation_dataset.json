@@ -1,0 +1,1540 @@
+{
+  "_description": "Labeled evaluation dataset for FreelanceReach BERT matching. Each entry has a proposal and a list of freelancer candidates with ground-truth relevance labels (1=relevant, 0=not relevant). Used to compute Precision@K, Recall@K, MRR, and NDCG.",
+  "version": "1.0",
+  "split": {
+    "train": 35,
+    "test": 15
+  },
+  "samples": [
+    {
+      "id": "eval_001",
+      "split": "train",
+      "proposal": {
+        "title": "Senior React Developer for E-Commerce Platform",
+        "description": "We need an experienced React developer to build a scalable e-commerce front-end. The project involves creating reusable component libraries, integrating REST APIs, implementing cart and checkout flows, and ensuring mobile responsiveness.",
+        "required_skills": ["React", "TypeScript", "REST API", "TailwindCSS", "Git"]
+      },
+      "candidates": [
+        {
+          "user_id": 101,
+          "headline": "Full-Stack React & Node.js Developer",
+          "bio": "5 years building React applications for e-commerce and SaaS platforms. Expert in TypeScript, Redux, and REST API integration.",
+          "skills": ["React", "TypeScript", "Node.js", "REST API", "TailwindCSS"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 102,
+          "headline": "Frontend Developer specialising in Vue.js",
+          "bio": "3 years of Vue.js and Nuxt.js development. Some React experience but primarily Vue-focused.",
+          "skills": ["Vue.js", "Nuxt.js", "JavaScript", "CSS"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 103,
+          "headline": "React & Next.js Expert",
+          "bio": "Senior developer with deep React, Next.js, and TypeScript skills. Built multiple high-traffic e-commerce frontends.",
+          "skills": ["React", "Next.js", "TypeScript", "TailwindCSS", "REST API", "Git"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 104,
+          "headline": "Python Django Backend Developer",
+          "bio": "Backend engineer specialising in Django REST Framework, PostgreSQL, and microservices.",
+          "skills": ["Python", "Django", "PostgreSQL", "REST API", "Docker"],
+          "experience_level": "senior",
+          "label": 0
+        },
+        {
+          "user_id": 105,
+          "headline": "Junior React Developer",
+          "bio": "1 year of React experience, worked on small projects. Learning TypeScript.",
+          "skills": ["React", "JavaScript", "HTML", "CSS"],
+          "experience_level": "junior",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_002",
+      "split": "train",
+      "proposal": {
+        "title": "Machine Learning Engineer — NLP Text Classification",
+        "description": "Build a text classification pipeline to categorise customer support tickets automatically. Must include data preprocessing, feature engineering, model training with BERT or similar transformers, and a REST API deployment.",
+        "required_skills": ["Python", "NLP", "BERT", "scikit-learn", "FastAPI"]
+      },
+      "candidates": [
+        {
+          "user_id": 201,
+          "headline": "NLP Engineer — BERT & Transformers Specialist",
+          "bio": "4 years of NLP research and engineering. Published work on text classification using BERT fine-tuning. Deployed models as FastAPI microservices.",
+          "skills": ["Python", "NLP", "BERT", "Transformers", "scikit-learn", "FastAPI", "PyTorch"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 202,
+          "headline": "Data Scientist — Statistical Modelling",
+          "bio": "Strong background in statistical modelling and data analysis. Some ML but mostly classical methods.",
+          "skills": ["Python", "R", "pandas", "scikit-learn", "Tableau"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 203,
+          "headline": "Full Stack Developer — React & Node",
+          "bio": "Web developer focused on frontend and Node.js backends. No ML experience.",
+          "skills": ["React", "Node.js", "JavaScript", "MongoDB"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 204,
+          "headline": "Machine Learning Engineer — Deep Learning & NLP",
+          "bio": "3 years building ML pipelines for text and vision tasks. Expert in Hugging Face Transformers and deploying models with FastAPI.",
+          "skills": ["Python", "NLP", "BERT", "PyTorch", "FastAPI", "scikit-learn", "Docker"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 205,
+          "headline": "DevOps Engineer — Kubernetes & CI/CD",
+          "bio": "Infrastructure specialist. Not involved in ML model development.",
+          "skills": ["Kubernetes", "Docker", "CI/CD", "AWS", "Terraform"],
+          "experience_level": "senior",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_003",
+      "split": "train",
+      "proposal": {
+        "title": "Mobile App Developer — React Native iOS & Android",
+        "description": "Develop a cross-platform mobile application for a healthcare startup. The app needs push notifications, offline support, integration with REST APIs, and a clean UI following Material Design principles.",
+        "required_skills": ["React Native", "JavaScript", "TypeScript", "REST API", "Push Notifications"]
+      },
+      "candidates": [
+        {
+          "user_id": 301,
+          "headline": "React Native Developer — Cross-Platform Mobile",
+          "bio": "4 years of React Native development. Shipped apps to App Store and Play Store. Expert in push notifications and offline-first architecture.",
+          "skills": ["React Native", "JavaScript", "TypeScript", "REST API", "Push Notifications", "Redux"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 302,
+          "headline": "iOS Swift Developer",
+          "bio": "Native iOS developer with 5 years of Swift experience. No React Native experience.",
+          "skills": ["Swift", "iOS", "Xcode", "Core Data"],
+          "experience_level": "senior",
+          "label": 0
+        },
+        {
+          "user_id": 303,
+          "headline": "Flutter & Dart Mobile Developer",
+          "bio": "Cross-platform mobile developer using Flutter. Can do React Native but primary expertise is Flutter.",
+          "skills": ["Flutter", "Dart", "Firebase", "REST API"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 304,
+          "headline": "React Native & TypeScript Expert",
+          "bio": "3 years building healthcare and fintech mobile apps in React Native. Strong TypeScript and API integration skills.",
+          "skills": ["React Native", "TypeScript", "REST API", "Push Notifications", "JavaScript"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 305,
+          "headline": "Backend PHP Laravel Developer",
+          "bio": "Server-side developer. Not experienced in mobile development.",
+          "skills": ["PHP", "Laravel", "MySQL", "REST API"],
+          "experience_level": "mid",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_004",
+      "split": "train",
+      "proposal": {
+        "title": "UI/UX Designer — SaaS Dashboard Redesign",
+        "description": "Complete redesign of our analytics dashboard. Need wireframes, high-fidelity prototypes in Figma, user research, and design system creation. The designer will work closely with the engineering team.",
+        "required_skills": ["Figma", "UI Design", "UX Design", "Design Systems", "Prototyping"]
+      },
+      "candidates": [
+        {
+          "user_id": 401,
+          "headline": "Senior UI/UX Designer — SaaS Products",
+          "bio": "6 years designing SaaS dashboards and analytics tools. Expert Figma user, created multiple design systems. Conduct user research and A/B testing.",
+          "skills": ["Figma", "UI Design", "UX Design", "Design Systems", "Prototyping", "User Research"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 402,
+          "headline": "Graphic Designer — Print & Branding",
+          "bio": "Traditional graphic designer specialising in brand identity and print media. Limited digital UX experience.",
+          "skills": ["Photoshop", "Illustrator", "InDesign", "Branding"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 403,
+          "headline": "Product Designer — Figma & Design Systems",
+          "bio": "4 years of product design for B2B SaaS. Built Figma component libraries and design tokens from scratch.",
+          "skills": ["Figma", "UI Design", "Design Systems", "Prototyping", "User Research"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 404,
+          "headline": "Frontend React Developer",
+          "bio": "Developer who implements designs, minimal design creation experience.",
+          "skills": ["React", "CSS", "TypeScript"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 405,
+          "headline": "Junior UI Designer",
+          "bio": "1 year experience. Learning Figma, limited design systems knowledge.",
+          "skills": ["Figma", "Photoshop", "UI Design"],
+          "experience_level": "junior",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_005",
+      "split": "train",
+      "proposal": {
+        "title": "DevOps Engineer — AWS Infrastructure Automation",
+        "description": "Set up CI/CD pipelines, containerise microservices with Docker and Kubernetes, manage AWS infrastructure with Terraform, and implement monitoring with Prometheus and Grafana.",
+        "required_skills": ["AWS", "Kubernetes", "Docker", "Terraform", "CI/CD"]
+      },
+      "candidates": [
+        {
+          "user_id": 501,
+          "headline": "Senior DevOps Engineer — AWS & Kubernetes",
+          "bio": "7 years of cloud infrastructure. AWS Solutions Architect certified. Expert in Kubernetes, Terraform, and CI/CD pipelines.",
+          "skills": ["AWS", "Kubernetes", "Docker", "Terraform", "CI/CD", "Prometheus", "Grafana"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 502,
+          "headline": "Django Backend Developer",
+          "bio": "Python/Django developer. Limited infrastructure experience.",
+          "skills": ["Python", "Django", "PostgreSQL", "REST API"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 503,
+          "headline": "Cloud Engineer — Azure & GCP",
+          "bio": "Cloud infrastructure engineer with strong Azure and GCP skills. Some AWS experience but not primary focus.",
+          "skills": ["Azure", "GCP", "Docker", "Kubernetes", "CI/CD"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 504,
+          "headline": "DevOps & Platform Engineer",
+          "bio": "5 years of DevOps. Specialises in AWS, Terraform infrastructure-as-code, Docker and Kubernetes deployments.",
+          "skills": ["AWS", "Terraform", "Docker", "Kubernetes", "CI/CD", "Linux"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 505,
+          "headline": "Android Mobile Developer",
+          "bio": "Mobile-only developer. No cloud infrastructure experience.",
+          "skills": ["Android", "Kotlin", "Java", "Firebase"],
+          "experience_level": "mid",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_006",
+      "split": "train",
+      "proposal": {
+        "title": "Laravel PHP Backend Developer — API Development",
+        "description": "Build RESTful APIs for a multi-tenant SaaS platform. Responsibilities include database design, authentication with Laravel Sanctum, role-based access control, and integration with third-party services.",
+        "required_skills": ["Laravel", "PHP", "MySQL", "REST API", "Authentication"]
+      },
+      "candidates": [
+        {
+          "user_id": 601,
+          "headline": "Senior Laravel Developer",
+          "bio": "6 years PHP and Laravel experience. Built large-scale multi-tenant SaaS APIs with Sanctum auth and complex RBAC systems.",
+          "skills": ["Laravel", "PHP", "MySQL", "REST API", "Authentication", "Docker"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 602,
+          "headline": "Node.js & Express Backend Developer",
+          "bio": "JavaScript backend developer. Strong Node.js but no Laravel experience.",
+          "skills": ["Node.js", "Express.js", "MongoDB", "REST API"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 603,
+          "headline": "PHP & Laravel Developer",
+          "bio": "3 years of Laravel development. Built REST APIs and authentication systems.",
+          "skills": ["PHP", "Laravel", "MySQL", "REST API", "Authentication"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 604,
+          "headline": "React Frontend Developer",
+          "bio": "Frontend-only developer. No backend or PHP experience.",
+          "skills": ["React", "JavaScript", "CSS", "HTML"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 605,
+          "headline": "WordPress & PHP Developer",
+          "bio": "WordPress and custom PHP development. Limited Laravel framework knowledge.",
+          "skills": ["PHP", "WordPress", "MySQL", "CSS"],
+          "experience_level": "mid",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_007",
+      "split": "train",
+      "proposal": {
+        "title": "Data Engineer — ETL Pipelines & Data Warehousing",
+        "description": "Design and implement ETL pipelines to ingest data from multiple sources into a centralised data warehouse on AWS Redshift. Experience with Airflow for orchestration and dbt for transformations required.",
+        "required_skills": ["Python", "SQL", "AWS", "Airflow", "dbt", "ETL"]
+      },
+      "candidates": [
+        {
+          "user_id": 701,
+          "headline": "Senior Data Engineer — AWS & Airflow",
+          "bio": "5 years of data engineering. Built ETL pipelines with Airflow and dbt on AWS Redshift. Expert in data warehousing.",
+          "skills": ["Python", "SQL", "AWS", "Airflow", "dbt", "ETL", "Redshift"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 702,
+          "headline": "Data Scientist — Machine Learning",
+          "bio": "ML-focused data scientist. Some SQL but no ETL pipeline experience.",
+          "skills": ["Python", "Machine Learning", "pandas", "scikit-learn"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 703,
+          "headline": "Backend Java Developer",
+          "bio": "Java microservices developer. Not a data engineering background.",
+          "skills": ["Java", "Spring Boot", "PostgreSQL", "REST API"],
+          "experience_level": "senior",
+          "label": 0
+        },
+        {
+          "user_id": 704,
+          "headline": "Data Engineer — Python & SQL Pipelines",
+          "bio": "3 years building data pipelines with Python, SQL, and Airflow. Experience with AWS Glue and Redshift.",
+          "skills": ["Python", "SQL", "ETL", "Airflow", "AWS", "dbt"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 705,
+          "headline": "Frontend Angular Developer",
+          "bio": "Web frontend developer. Not a data role.",
+          "skills": ["Angular", "TypeScript", "JavaScript"],
+          "experience_level": "mid",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_008",
+      "split": "train",
+      "proposal": {
+        "title": "Blockchain Developer — Solidity Smart Contracts",
+        "description": "Develop and audit smart contracts on Ethereum for a DeFi protocol. Must understand ERC-20/721 standards, gas optimisation, and security best practices. Experience with Hardhat and OpenZeppelin required.",
+        "required_skills": ["Solidity", "Ethereum", "Web3", "Hardhat", "Smart Contracts"]
+      },
+      "candidates": [
+        {
+          "user_id": 801,
+          "headline": "Blockchain Developer — Solidity & DeFi",
+          "bio": "4 years of smart contract development on Ethereum. Audited multiple DeFi protocols. Expert in ERC standards and gas optimisation with Hardhat.",
+          "skills": ["Solidity", "Ethereum", "Web3", "Hardhat", "OpenZeppelin", "Smart Contracts"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 802,
+          "headline": "Python Backend Developer",
+          "bio": "Python REST API developer with Django. No blockchain experience.",
+          "skills": ["Python", "Django", "REST API", "PostgreSQL"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 803,
+          "headline": "Web3 & Solidity Smart Contract Developer",
+          "bio": "3 years in blockchain. Developed ERC-20 and NFT contracts with Solidity, Hardhat, and Ethers.js.",
+          "skills": ["Solidity", "Web3", "Hardhat", "Ethereum", "JavaScript"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 804,
+          "headline": "Mobile React Native Developer",
+          "bio": "Mobile app developer. No blockchain experience.",
+          "skills": ["React Native", "TypeScript", "REST API"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 805,
+          "headline": "Junior Web Developer",
+          "bio": "HTML, CSS, JavaScript basics. No blockchain background.",
+          "skills": ["HTML", "CSS", "JavaScript"],
+          "experience_level": "junior",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_009",
+      "split": "train",
+      "proposal": {
+        "title": "Technical Content Writer — Developer Documentation",
+        "description": "Write clear, accurate technical documentation for REST APIs, SDKs, and developer guides. Must understand software concepts well enough to explain them to developers and produce code samples.",
+        "required_skills": ["Technical Writing", "REST API", "Markdown", "Documentation", "Git"]
+      },
+      "candidates": [
+        {
+          "user_id": 901,
+          "headline": "Technical Writer — API & SDK Documentation",
+          "bio": "5 years writing developer docs for REST APIs, SDKs, and CLI tools. Produce code samples in Python, JavaScript, and cURL.",
+          "skills": ["Technical Writing", "REST API", "Markdown", "Documentation", "Git", "Python", "JavaScript"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 902,
+          "headline": "Blog & SEO Content Writer",
+          "bio": "General content and SEO writer. Not a technical background.",
+          "skills": ["Content Writing", "SEO", "WordPress"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 903,
+          "headline": "Developer Advocate & Technical Writer",
+          "bio": "3 years as developer advocate. Write API documentation, tutorials, and code samples.",
+          "skills": ["Technical Writing", "REST API", "Documentation", "Markdown", "Git"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 904,
+          "headline": "Social Media & Brand Copywriter",
+          "bio": "Social media manager and copywriter. No technical documentation experience.",
+          "skills": ["Copywriting", "Social Media", "Content Writing"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 905,
+          "headline": "DevOps Engineer",
+          "bio": "Infrastructure engineer. Not a writing role.",
+          "skills": ["Docker", "Kubernetes", "AWS", "CI/CD"],
+          "experience_level": "senior",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_010",
+      "split": "train",
+      "proposal": {
+        "title": "Cybersecurity Analyst — Penetration Testing",
+        "description": "Conduct penetration tests on web applications and APIs. Produce detailed vulnerability reports with CVSS scores and remediation recommendations. Must be familiar with OWASP Top 10.",
+        "required_skills": ["Penetration Testing", "OWASP", "Cybersecurity", "Burp Suite", "Python"]
+      },
+      "candidates": [
+        {
+          "user_id": 1001,
+          "headline": "Penetration Tester — Web & API Security",
+          "bio": "5 years offensive security. CEH certified. Conduct web app and API penetration tests, write CVSS-scored reports using OWASP methodology.",
+          "skills": ["Penetration Testing", "OWASP", "Cybersecurity", "Burp Suite", "Python", "Metasploit"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 1002,
+          "headline": "Network Engineer",
+          "bio": "Network infrastructure specialist. Not an application security background.",
+          "skills": ["Networking", "Cisco", "Firewalls", "VPN"],
+          "experience_level": "senior",
+          "label": 0
+        },
+        {
+          "user_id": 1003,
+          "headline": "Security Researcher & Ethical Hacker",
+          "bio": "3 years of web application security research. Found and reported OWASP Top 10 vulnerabilities in bug bounty programs.",
+          "skills": ["Cybersecurity", "OWASP", "Penetration Testing", "Burp Suite", "Python"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 1004,
+          "headline": "Python Django Developer",
+          "bio": "Backend developer. Writes secure code but not a pen-tester.",
+          "skills": ["Python", "Django", "REST API"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 1005,
+          "headline": "Junior Web Developer",
+          "bio": "Entry level web developer. No security background.",
+          "skills": ["HTML", "CSS", "JavaScript", "React"],
+          "experience_level": "junior",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_011",
+      "split": "train",
+      "proposal": {
+        "title": "Video Editor — YouTube & Social Media Content",
+        "description": "Edit raw footage into engaging YouTube videos and short-form social media content. Must be proficient in colour grading, motion graphics, and audio mixing.",
+        "required_skills": ["Video Editing", "Premiere Pro", "After Effects", "Colour Grading", "Motion Graphics"]
+      },
+      "candidates": [
+        {
+          "user_id": 1101,
+          "headline": "Professional Video Editor — YouTube & Ads",
+          "bio": "5 years editing YouTube channels with 500K+ subscribers. Expert in Premiere Pro, After Effects, and motion graphics.",
+          "skills": ["Video Editing", "Premiere Pro", "After Effects", "Colour Grading", "Motion Graphics"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 1102,
+          "headline": "3D Animator — Cinema 4D & Blender",
+          "bio": "3D animation specialist. Not primarily a video editor.",
+          "skills": ["Cinema 4D", "Blender", "3D Modeling", "Animation"],
+          "experience_level": "senior",
+          "label": 0
+        },
+        {
+          "user_id": 1103,
+          "headline": "Video Editor & Motion Designer",
+          "bio": "3 years editing social media and YouTube content. After Effects motion graphics and DaVinci colour grading.",
+          "skills": ["Video Editing", "After Effects", "Premiere Pro", "Colour Grading", "DaVinci Resolve"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 1104,
+          "headline": "Photographer & Photo Editor",
+          "bio": "Photography and Lightroom/Photoshop specialist. Not a video editor.",
+          "skills": ["Photography", "Lightroom", "Photoshop"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 1105,
+          "headline": "Frontend React Developer",
+          "bio": "Software developer. No media editing skills.",
+          "skills": ["React", "TypeScript", "Node.js"],
+          "experience_level": "mid",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_012",
+      "split": "train",
+      "proposal": {
+        "title": "Python FastAPI Backend — AI Microservice Integration",
+        "description": "Build a Python FastAPI microservice that integrates with OpenAI and Gemini APIs, implements vector search with Qdrant, and exposes REST endpoints consumed by a Laravel backend.",
+        "required_skills": ["Python", "FastAPI", "LLM", "Qdrant", "REST API", "Docker"]
+      },
+      "candidates": [
+        {
+          "user_id": 1201,
+          "headline": "Python AI Engineer — FastAPI & LLM Integration",
+          "bio": "4 years building AI microservices with FastAPI. Integrated GPT-4, Gemini, and vector DBs including Qdrant. Deployed with Docker.",
+          "skills": ["Python", "FastAPI", "LLM", "Qdrant", "REST API", "Docker", "OpenAI"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 1202,
+          "headline": "Java Spring Boot Developer",
+          "bio": "Enterprise Java backend developer. Not a Python or AI background.",
+          "skills": ["Java", "Spring Boot", "MySQL", "REST API"],
+          "experience_level": "senior",
+          "label": 0
+        },
+        {
+          "user_id": 1203,
+          "headline": "ML Engineer — Python & Model Deployment",
+          "bio": "Machine learning engineer with FastAPI deployment experience. Familiar with LLM APIs and vector search.",
+          "skills": ["Python", "FastAPI", "Machine Learning", "LLM", "Docker", "REST API"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 1204,
+          "headline": "PHP Laravel Developer",
+          "bio": "PHP/Laravel backend developer. No Python or AI experience.",
+          "skills": ["PHP", "Laravel", "MySQL"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 1205,
+          "headline": "Junior Python Developer",
+          "bio": "Python basics, some Django. No FastAPI or ML background.",
+          "skills": ["Python", "Django", "PostgreSQL"],
+          "experience_level": "junior",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_013",
+      "split": "train",
+      "proposal": {
+        "title": "Shopify E-Commerce Developer",
+        "description": "Customise and extend a Shopify store — theme development with Liquid, custom app development, third-party integrations (payment gateways, CRM), and performance optimisation.",
+        "required_skills": ["Shopify", "Liquid", "JavaScript", "REST API", "E-Commerce"]
+      },
+      "candidates": [
+        {
+          "user_id": 1301,
+          "headline": "Shopify Expert — Theme & App Development",
+          "bio": "5 years Shopify development. Custom Liquid theme development, Shopify app development with Node.js, and payment gateway integrations.",
+          "skills": ["Shopify", "Liquid", "JavaScript", "Node.js", "REST API", "E-Commerce"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 1302,
+          "headline": "WooCommerce WordPress Developer",
+          "bio": "E-commerce developer but focused on WooCommerce/WordPress. No Shopify experience.",
+          "skills": ["WordPress", "WooCommerce", "PHP", "E-Commerce"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 1303,
+          "headline": "Shopify & Liquid Theme Developer",
+          "bio": "3 years Shopify theme customisation with Liquid. Integrated multiple payment gateways.",
+          "skills": ["Shopify", "Liquid", "JavaScript", "CSS", "E-Commerce"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 1304,
+          "headline": "React SPA Developer",
+          "bio": "Single-page application developer. Not an e-commerce specialist.",
+          "skills": ["React", "TypeScript", "REST API"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 1305,
+          "headline": "Python Backend Developer",
+          "bio": "Python developer. Not an e-commerce or Shopify background.",
+          "skills": ["Python", "Django", "PostgreSQL"],
+          "experience_level": "mid",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_014",
+      "split": "train",
+      "proposal": {
+        "title": "Full-Stack Developer — Next.js & Laravel SaaS",
+        "description": "Build a full-stack SaaS application with Next.js frontend (TypeScript, TailwindCSS, App Router) and Laravel API backend. Must handle authentication, multi-tenancy, Stripe billing integration, and responsive design.",
+        "required_skills": ["Next.js", "TypeScript", "Laravel", "PHP", "TailwindCSS", "Stripe"]
+      },
+      "candidates": [
+        {
+          "user_id": 1401,
+          "headline": "Full-Stack Developer — Next.js & Laravel",
+          "bio": "5 years full-stack development with Next.js and Laravel. Built multiple SaaS platforms with Stripe billing and multi-tenancy.",
+          "skills": ["Next.js", "TypeScript", "Laravel", "PHP", "TailwindCSS", "Stripe", "MySQL"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 1402,
+          "headline": "Vue.js & Django Developer",
+          "bio": "Full-stack but Vue and Django focused. Not experienced with Next.js or Laravel.",
+          "skills": ["Vue.js", "Django", "Python", "PostgreSQL"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 1403,
+          "headline": "Next.js TypeScript Developer",
+          "bio": "3 years Next.js with TypeScript. Some PHP experience but prefers Node backends.",
+          "skills": ["Next.js", "TypeScript", "React", "TailwindCSS", "Node.js"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 1404,
+          "headline": "Senior Full-Stack Engineer — Next.js & Laravel & Stripe",
+          "bio": "4 years building SaaS with Next.js, Laravel, and Stripe integration. Expert in TypeScript and TailwindCSS.",
+          "skills": ["Next.js", "TypeScript", "Laravel", "PHP", "TailwindCSS", "Stripe"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 1405,
+          "headline": "Angular & Java Backend Developer",
+          "bio": "Enterprise developer. Not the right tech stack for this role.",
+          "skills": ["Angular", "Java", "Spring Boot", "PostgreSQL"],
+          "experience_level": "senior",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_015",
+      "split": "train",
+      "proposal": {
+        "title": "Data Visualisation Developer — Power BI & Tableau",
+        "description": "Build interactive dashboards and reports using Power BI and Tableau for business stakeholders. Must connect to SQL databases, create custom DAX measures, and deliver self-service BI solutions.",
+        "required_skills": ["Power BI", "Tableau", "SQL", "DAX", "Data Visualisation"]
+      },
+      "candidates": [
+        {
+          "user_id": 1501,
+          "headline": "BI Developer — Power BI & Tableau",
+          "bio": "5 years BI development. Expert in Power BI DAX, Tableau calculated fields, and SQL database connections.",
+          "skills": ["Power BI", "Tableau", "SQL", "DAX", "Data Visualisation"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 1502,
+          "headline": "Data Engineer — ETL & Pipelines",
+          "bio": "Backend data engineer. Builds pipelines but not a visualisation specialist.",
+          "skills": ["Python", "SQL", "Airflow", "AWS"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 1503,
+          "headline": "BI Analyst — Power BI Reports",
+          "bio": "3 years Power BI development with DAX and SQL. Some Tableau.",
+          "skills": ["Power BI", "DAX", "SQL", "Data Visualisation", "Excel"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 1504,
+          "headline": "Frontend React Developer",
+          "bio": "JavaScript developer. Not a BI tools background.",
+          "skills": ["React", "TypeScript", "D3.js"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 1505,
+          "headline": "Machine Learning Engineer",
+          "bio": "ML engineer. Not a BI visualisation specialist.",
+          "skills": ["Python", "Machine Learning", "TensorFlow"],
+          "experience_level": "senior",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_016",
+      "split": "test",
+      "proposal": {
+        "title": "Flutter Developer — Cross-Platform Mobile App",
+        "description": "Build a cross-platform mobile app for iOS and Android using Flutter and Dart. Requires Firebase integration, state management with Riverpod, and RESTful API consumption.",
+        "required_skills": ["Flutter", "Dart", "Firebase", "REST API", "Mobile Development"]
+      },
+      "candidates": [
+        {
+          "user_id": 1601,
+          "headline": "Flutter & Firebase Mobile Developer",
+          "bio": "4 years Flutter development. Expert in Firebase, Riverpod state management, and API integration.",
+          "skills": ["Flutter", "Dart", "Firebase", "REST API", "Riverpod"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 1602,
+          "headline": "React Native Developer",
+          "bio": "Cross-platform mobile but using React Native not Flutter.",
+          "skills": ["React Native", "JavaScript", "TypeScript"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 1603,
+          "headline": "Flutter Developer — 3 Years Experience",
+          "bio": "3 years Flutter and Dart. Firebase and REST API integrations.",
+          "skills": ["Flutter", "Dart", "Firebase", "REST API", "Mobile Development"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 1604,
+          "headline": "Java Android Developer",
+          "bio": "Native Android developer. Not Flutter.",
+          "skills": ["Java", "Android", "Kotlin"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 1605,
+          "headline": "Backend Python Developer",
+          "bio": "Server-side developer. No mobile experience.",
+          "skills": ["Python", "FastAPI", "PostgreSQL"],
+          "experience_level": "mid",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_017",
+      "split": "test",
+      "proposal": {
+        "title": "Graphic Designer — Brand Identity Package",
+        "description": "Create a complete brand identity for a startup: logo, colour palette, typography system, business card, letterhead, and brand guidelines document.",
+        "required_skills": ["Logo Design", "Branding", "Adobe Illustrator", "Photoshop", "Typography"]
+      },
+      "candidates": [
+        {
+          "user_id": 1701,
+          "headline": "Brand Identity Designer",
+          "bio": "6 years creating brand identities for startups. Expert Illustrator/Photoshop user, specialises in logo design and brand guidelines.",
+          "skills": ["Logo Design", "Branding", "Adobe Illustrator", "Photoshop", "Typography"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 1702,
+          "headline": "Video Editor & Motion Designer",
+          "bio": "Motion graphics artist. Not a print/brand designer.",
+          "skills": ["After Effects", "Premiere Pro", "Motion Graphics"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 1703,
+          "headline": "Graphic Designer — Logo & Branding",
+          "bio": "3 years brand identity design. Illustrator and typography specialist.",
+          "skills": ["Logo Design", "Branding", "Adobe Illustrator", "Typography", "Photoshop"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 1704,
+          "headline": "UI/UX Designer — Digital Products",
+          "bio": "Digital product designer. Figma specialist, not print/brand focused.",
+          "skills": ["Figma", "UI Design", "UX Design"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 1705,
+          "headline": "Frontend Developer",
+          "bio": "Developer. No design skills.",
+          "skills": ["HTML", "CSS", "JavaScript"],
+          "experience_level": "junior",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_018",
+      "split": "test",
+      "proposal": {
+        "title": "Go (Golang) Backend Developer — High-Performance API",
+        "description": "Build a high-performance REST API in Go for a real-time financial data platform. Requires experience with concurrency, PostgreSQL, Redis caching, and gRPC.",
+        "required_skills": ["Go", "Golang", "PostgreSQL", "Redis", "gRPC", "REST API"]
+      },
+      "candidates": [
+        {
+          "user_id": 1801,
+          "headline": "Senior Go Developer — Microservices",
+          "bio": "5 years Golang microservices. Expert in concurrency, PostgreSQL, Redis, and gRPC.",
+          "skills": ["Go", "Golang", "PostgreSQL", "Redis", "gRPC", "REST API", "Docker"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 1802,
+          "headline": "Python FastAPI Developer",
+          "bio": "Python REST API developer. No Go experience.",
+          "skills": ["Python", "FastAPI", "PostgreSQL", "Redis"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 1803,
+          "headline": "Go & gRPC Backend Engineer",
+          "bio": "3 years Go with gRPC and PostgreSQL for high-throughput systems.",
+          "skills": ["Go", "Golang", "gRPC", "PostgreSQL", "REST API"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 1804,
+          "headline": "Java Spring Boot Developer",
+          "bio": "Enterprise Java. Not a Go developer.",
+          "skills": ["Java", "Spring Boot", "PostgreSQL"],
+          "experience_level": "senior",
+          "label": 0
+        },
+        {
+          "user_id": 1805,
+          "headline": "React Frontend Developer",
+          "bio": "Frontend developer. Not backend.",
+          "skills": ["React", "TypeScript", "CSS"],
+          "experience_level": "mid",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_019",
+      "split": "test",
+      "proposal": {
+        "title": "WordPress Developer — Custom Theme & Plugin",
+        "description": "Build a custom WordPress theme from scratch and develop two custom plugins for a news media site. Must understand the WordPress hook system, Gutenberg blocks, and performance optimisation.",
+        "required_skills": ["WordPress", "PHP", "JavaScript", "Gutenberg", "CSS"]
+      },
+      "candidates": [
+        {
+          "user_id": 1901,
+          "headline": "Senior WordPress Developer",
+          "bio": "7 years WordPress. Custom theme and plugin development, Gutenberg blocks, WP REST API.",
+          "skills": ["WordPress", "PHP", "JavaScript", "Gutenberg", "CSS", "MySQL"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 1902,
+          "headline": "Laravel PHP Developer",
+          "bio": "PHP developer but framework-focused on Laravel, not WordPress.",
+          "skills": ["PHP", "Laravel", "MySQL"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 1903,
+          "headline": "WordPress & WooCommerce Developer",
+          "bio": "4 years WordPress custom development and WooCommerce.",
+          "skills": ["WordPress", "PHP", "JavaScript", "CSS", "Gutenberg"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 1904,
+          "headline": "Shopify Developer",
+          "bio": "E-commerce developer but Shopify/Liquid, not WordPress.",
+          "skills": ["Shopify", "Liquid", "JavaScript"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 1905,
+          "headline": "Python Django Developer",
+          "bio": "Python web developer. No WordPress background.",
+          "skills": ["Python", "Django", "PostgreSQL"],
+          "experience_level": "mid",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_020",
+      "split": "test",
+      "proposal": {
+        "title": "AWS Solutions Architect — Serverless Architecture",
+        "description": "Design and implement a serverless architecture on AWS using Lambda, API Gateway, DynamoDB, and S3. Must implement infrastructure as code with CDK or Terraform and ensure auto-scaling.",
+        "required_skills": ["AWS", "Lambda", "Serverless", "DynamoDB", "Terraform", "API Gateway"]
+      },
+      "candidates": [
+        {
+          "user_id": 2001,
+          "headline": "AWS Architect — Serverless & IaC",
+          "bio": "AWS Solutions Architect certified. 6 years building serverless architectures with Lambda, DynamoDB, and CDK/Terraform.",
+          "skills": ["AWS", "Lambda", "Serverless", "DynamoDB", "Terraform", "API Gateway", "CDK"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 2002,
+          "headline": "Azure Cloud Engineer",
+          "bio": "Microsoft Azure specialist. Not focused on AWS.",
+          "skills": ["Azure", "Kubernetes", "Docker", "CI/CD"],
+          "experience_level": "senior",
+          "label": 0
+        },
+        {
+          "user_id": 2003,
+          "headline": "AWS & Serverless Developer",
+          "bio": "3 years AWS serverless. Lambda, API Gateway, DynamoDB, and Terraform deployments.",
+          "skills": ["AWS", "Lambda", "Serverless", "DynamoDB", "API Gateway", "Terraform"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 2004,
+          "headline": "On-Premises Linux SysAdmin",
+          "bio": "Traditional sysadmin. Not cloud-native or serverless focused.",
+          "skills": ["Linux", "Bash", "Networking", "MySQL"],
+          "experience_level": "senior",
+          "label": 0
+        },
+        {
+          "user_id": 2005,
+          "headline": "React Frontend Developer",
+          "bio": "Frontend developer. No cloud background.",
+          "skills": ["React", "TypeScript", "TailwindCSS"],
+          "experience_level": "mid",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_021",
+      "split": "test",
+      "proposal": {
+        "title": "Machine Learning Engineer — Computer Vision",
+        "description": "Build a real-time object detection system using YOLO or similar CNN architectures. Must implement model training pipelines, data augmentation, and deploy the model as a REST API.",
+        "required_skills": ["Python", "Computer Vision", "YOLO", "PyTorch", "Deep Learning", "REST API"]
+      },
+      "candidates": [
+        {
+          "user_id": 2101,
+          "headline": "Computer Vision Engineer — YOLO & PyTorch",
+          "bio": "4 years computer vision. Trained YOLOv8 and EfficientDet models, deployed as FastAPI services.",
+          "skills": ["Python", "Computer Vision", "YOLO", "PyTorch", "Deep Learning", "REST API"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 2102,
+          "headline": "NLP Engineer — BERT Fine-Tuning",
+          "bio": "NLP specialist. Deep learning but text domain, not vision.",
+          "skills": ["Python", "NLP", "BERT", "PyTorch", "Deep Learning"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 2103,
+          "headline": "ML Engineer — Object Detection & Segmentation",
+          "bio": "3 years computer vision ML. YOLO, Mask R-CNN, and PyTorch pipelines with REST API deployment.",
+          "skills": ["Python", "Computer Vision", "YOLO", "PyTorch", "Deep Learning", "REST API"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 2104,
+          "headline": "Data Analyst — Excel & Tableau",
+          "bio": "Business analyst. Not an ML engineer.",
+          "skills": ["Excel", "Tableau", "SQL", "Power BI"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 2105,
+          "headline": "iOS Swift Developer",
+          "bio": "Mobile developer. Not ML.",
+          "skills": ["Swift", "iOS", "Xcode"],
+          "experience_level": "mid",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_022",
+      "split": "test",
+      "proposal": {
+        "title": "SEO Specialist — Technical SEO & Content Strategy",
+        "description": "Conduct technical SEO audits, implement schema markup, optimise Core Web Vitals, and develop a content strategy to improve organic search rankings.",
+        "required_skills": ["SEO", "Technical SEO", "Google Analytics", "Content Strategy", "Schema Markup"]
+      },
+      "candidates": [
+        {
+          "user_id": 2201,
+          "headline": "Senior SEO Specialist",
+          "bio": "5 years technical and content SEO. Core Web Vitals optimisation, schema markup implementation, and Google Analytics expert.",
+          "skills": ["SEO", "Technical SEO", "Google Analytics", "Content Strategy", "Schema Markup"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 2202,
+          "headline": "Social Media Manager",
+          "bio": "Social media specialist. Not SEO or search-focused.",
+          "skills": ["Social Media", "Instagram", "Facebook Ads", "Content Writing"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 2203,
+          "headline": "SEO & Content Marketing Specialist",
+          "bio": "3 years SEO and content strategy. Technical SEO audits and schema markup.",
+          "skills": ["SEO", "Technical SEO", "Content Strategy", "Google Analytics"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 2204,
+          "headline": "PPC & Google Ads Manager",
+          "bio": "Paid advertising specialist. Not organic SEO.",
+          "skills": ["Google Ads", "PPC", "Facebook Ads"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 2205,
+          "headline": "React Developer",
+          "bio": "Developer. Not a marketing or SEO background.",
+          "skills": ["React", "TypeScript", "JavaScript"],
+          "experience_level": "mid",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_023",
+      "split": "test",
+      "proposal": {
+        "title": "Database Administrator — PostgreSQL Performance Tuning",
+        "description": "Optimise PostgreSQL database performance, implement query tuning, indexing strategies, replication setup, and backup/recovery procedures for a high-traffic production environment.",
+        "required_skills": ["PostgreSQL", "SQL", "Database Administration", "Query Optimisation", "Replication"]
+      },
+      "candidates": [
+        {
+          "user_id": 2301,
+          "headline": "Senior PostgreSQL DBA",
+          "bio": "6 years PostgreSQL administration. Query optimisation, partitioning, replication, and backup strategies for 100M+ row databases.",
+          "skills": ["PostgreSQL", "SQL", "Database Administration", "Query Optimisation", "Replication"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 2302,
+          "headline": "MongoDB Developer",
+          "bio": "NoSQL database developer. Not PostgreSQL focused.",
+          "skills": ["MongoDB", "Node.js", "NoSQL"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 2303,
+          "headline": "PostgreSQL & MySQL DBA",
+          "bio": "4 years database administration for PostgreSQL and MySQL. Indexing, query plans, and replication.",
+          "skills": ["PostgreSQL", "MySQL", "SQL", "Database Administration", "Query Optimisation"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 2304,
+          "headline": "Python Data Scientist",
+          "bio": "Data science with SQL for querying but not a DBA.",
+          "skills": ["Python", "SQL", "pandas", "Machine Learning"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 2305,
+          "headline": "Frontend Developer",
+          "bio": "UI developer. No database background.",
+          "skills": ["React", "CSS", "HTML"],
+          "experience_level": "junior",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_024",
+      "split": "test",
+      "proposal": {
+        "title": "Ruby on Rails Developer — SaaS Application",
+        "description": "Maintain and extend a Ruby on Rails SaaS application. Add background jobs with Sidekiq, improve test coverage with RSpec, integrate Stripe billing, and deploy on Heroku.",
+        "required_skills": ["Ruby on Rails", "Ruby", "RSpec", "Sidekiq", "PostgreSQL", "Stripe"]
+      },
+      "candidates": [
+        {
+          "user_id": 2401,
+          "headline": "Senior Ruby on Rails Developer",
+          "bio": "7 years Rails. Sidekiq background jobs, RSpec testing, Stripe integration, and Heroku deployments.",
+          "skills": ["Ruby on Rails", "Ruby", "RSpec", "Sidekiq", "PostgreSQL", "Stripe"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 2402,
+          "headline": "Python Django Developer",
+          "bio": "Python web developer. Not Ruby/Rails.",
+          "skills": ["Python", "Django", "PostgreSQL", "REST API"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 2403,
+          "headline": "Rails Developer — 3 Years",
+          "bio": "3 years Ruby on Rails. RSpec, Sidekiq, PostgreSQL.",
+          "skills": ["Ruby on Rails", "Ruby", "RSpec", "Sidekiq", "PostgreSQL"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 2404,
+          "headline": "Node.js Express Developer",
+          "bio": "JavaScript backend. Not Ruby.",
+          "skills": ["Node.js", "Express.js", "MongoDB", "REST API"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 2405,
+          "headline": "React Native Mobile Developer",
+          "bio": "Mobile developer. Not backend.",
+          "skills": ["React Native", "TypeScript", "JavaScript"],
+          "experience_level": "mid",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_025",
+      "split": "test",
+      "proposal": {
+        "title": "Copywriter — SaaS Product Marketing",
+        "description": "Write compelling website copy, email sequences, landing pages, and product descriptions for a B2B SaaS product. Must understand conversion-focused writing and have a tech background.",
+        "required_skills": ["Copywriting", "Content Marketing", "Email Marketing", "Landing Pages", "B2B SaaS"]
+      },
+      "candidates": [
+        {
+          "user_id": 2501,
+          "headline": "SaaS Copywriter & Content Strategist",
+          "bio": "5 years writing for B2B SaaS companies. Landing pages, email sequences, and product copy that drives conversions.",
+          "skills": ["Copywriting", "Content Marketing", "Email Marketing", "Landing Pages", "B2B SaaS"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 2502,
+          "headline": "Technical Writer — API Documentation",
+          "bio": "Technical documentation writer. Not marketing copywriter.",
+          "skills": ["Technical Writing", "Documentation", "REST API"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 2503,
+          "headline": "B2B Content & Email Marketing Specialist",
+          "bio": "3 years B2B SaaS marketing. Email campaigns, landing pages, and conversion copy.",
+          "skills": ["Copywriting", "Email Marketing", "Landing Pages", "Content Marketing", "B2B SaaS"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 2504,
+          "headline": "Social Media Manager",
+          "bio": "Social media content creator. Not long-form copy or email marketing.",
+          "skills": ["Social Media", "Instagram", "Content Writing"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 2505,
+          "headline": "Backend Developer",
+          "bio": "Software engineer. No marketing background.",
+          "skills": ["Python", "Django", "PostgreSQL"],
+          "experience_level": "mid",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_026",
+      "split": "test",
+      "proposal": {
+        "title": "Rust Systems Developer — High-Performance Networking",
+        "description": "Build high-performance networking components in Rust for a distributed systems platform. Must be comfortable with async Rust, Tokio, and low-level socket programming.",
+        "required_skills": ["Rust", "Tokio", "Async", "Networking", "Systems Programming"]
+      },
+      "candidates": [
+        {
+          "user_id": 2601,
+          "headline": "Senior Rust Systems Developer",
+          "bio": "4 years Rust. Expert in async/await with Tokio, networking, and zero-cost abstractions for systems programming.",
+          "skills": ["Rust", "Tokio", "Async", "Networking", "Systems Programming", "Linux"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 2602,
+          "headline": "C++ Game Developer",
+          "bio": "C++ developer for game engines. Not Rust or networking focused.",
+          "skills": ["C++", "Game Development", "OpenGL"],
+          "experience_level": "senior",
+          "label": 0
+        },
+        {
+          "user_id": 2603,
+          "headline": "Rust & WebAssembly Developer",
+          "bio": "3 years Rust including async Tokio and WASM. Some networking components.",
+          "skills": ["Rust", "Tokio", "Async", "WebAssembly", "Networking"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 2604,
+          "headline": "Python Backend Developer",
+          "bio": "Python developer. Not Rust or systems programming.",
+          "skills": ["Python", "FastAPI", "PostgreSQL"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 2605,
+          "headline": "Junior JavaScript Developer",
+          "bio": "Frontend JavaScript. Not systems programming.",
+          "skills": ["JavaScript", "React", "HTML", "CSS"],
+          "experience_level": "junior",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_027",
+      "split": "test",
+      "proposal": {
+        "title": "Kubernetes Platform Engineer — GitOps & ArgoCD",
+        "description": "Manage production Kubernetes clusters. Implement GitOps workflows with ArgoCD, Helm chart management, RBAC policies, and observability with Prometheus and Grafana.",
+        "required_skills": ["Kubernetes", "ArgoCD", "GitOps", "Helm", "Prometheus", "Grafana"]
+      },
+      "candidates": [
+        {
+          "user_id": 2701,
+          "headline": "Platform Engineer — Kubernetes & GitOps",
+          "bio": "5 years Kubernetes platform engineering. Expert in ArgoCD, Helm, RBAC, Prometheus and Grafana observability stacks.",
+          "skills": ["Kubernetes", "ArgoCD", "GitOps", "Helm", "Prometheus", "Grafana", "Docker"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 2702,
+          "headline": "AWS Solutions Architect",
+          "bio": "AWS cloud architect. Not Kubernetes/GitOps specialist.",
+          "skills": ["AWS", "Terraform", "Lambda", "Serverless"],
+          "experience_level": "senior",
+          "label": 0
+        },
+        {
+          "user_id": 2703,
+          "headline": "DevOps Engineer — Kubernetes & ArgoCD",
+          "bio": "3 years Kubernetes with ArgoCD GitOps, Helm charts, and Prometheus monitoring.",
+          "skills": ["Kubernetes", "ArgoCD", "Helm", "GitOps", "Prometheus", "Grafana"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 2704,
+          "headline": "Python Data Engineer",
+          "bio": "Data pipeline engineer. Not infrastructure or Kubernetes.",
+          "skills": ["Python", "Airflow", "SQL", "AWS"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 2705,
+          "headline": "Mobile Flutter Developer",
+          "bio": "Mobile app developer. Not infrastructure.",
+          "skills": ["Flutter", "Dart", "Firebase"],
+          "experience_level": "mid",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_028",
+      "split": "test",
+      "proposal": {
+        "title": "E-Learning Instructional Designer",
+        "description": "Design and develop interactive e-learning courses using Articulate Storyline. Create storyboards, record voiceovers, produce SCORM-compliant modules, and measure learner outcomes with xAPI.",
+        "required_skills": ["Instructional Design", "Articulate Storyline", "SCORM", "E-Learning", "xAPI"]
+      },
+      "candidates": [
+        {
+          "user_id": 2801,
+          "headline": "Senior Instructional Designer — Articulate Storyline",
+          "bio": "6 years e-learning design. Expert in Articulate Storyline, SCORM, xAPI, and LMS integration.",
+          "skills": ["Instructional Design", "Articulate Storyline", "SCORM", "E-Learning", "xAPI"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 2802,
+          "headline": "Graphic Designer — Print Media",
+          "bio": "Traditional graphic designer. No e-learning experience.",
+          "skills": ["Illustrator", "Photoshop", "Branding"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 2803,
+          "headline": "E-Learning Developer — Storyline & Rise",
+          "bio": "3 years e-learning development with Articulate Storyline and Rise. SCORM and xAPI compliant.",
+          "skills": ["Instructional Design", "Articulate Storyline", "SCORM", "E-Learning"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 2804,
+          "headline": "YouTube Content Creator",
+          "bio": "Video content creator. Not instructional design or SCORM.",
+          "skills": ["Video Editing", "Premiere Pro", "Content Writing"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 2805,
+          "headline": "Frontend Web Developer",
+          "bio": "Web developer. Not e-learning or instructional design.",
+          "skills": ["React", "TypeScript", "CSS"],
+          "experience_level": "mid",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_029",
+      "split": "test",
+      "proposal": {
+        "title": "Elasticsearch & Kibana Engineer — Search Optimisation",
+        "description": "Design and optimise Elasticsearch indices, implement full-text search with custom analysers, build Kibana dashboards, and tune cluster performance for a high-throughput logging system.",
+        "required_skills": ["Elasticsearch", "Kibana", "ELK Stack", "Search Optimisation", "Python"]
+      },
+      "candidates": [
+        {
+          "user_id": 2901,
+          "headline": "Elasticsearch Engineer — ELK Stack",
+          "bio": "5 years Elasticsearch and ELK stack. Custom analysers, Kibana dashboards, and cluster tuning for high-volume log ingestion.",
+          "skills": ["Elasticsearch", "Kibana", "ELK Stack", "Search Optimisation", "Python", "Logstash"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 2902,
+          "headline": "MySQL DBA",
+          "bio": "Relational database specialist. Not Elasticsearch or ELK.",
+          "skills": ["MySQL", "SQL", "Database Administration"],
+          "experience_level": "senior",
+          "label": 0
+        },
+        {
+          "user_id": 2903,
+          "headline": "Elasticsearch & Python Developer",
+          "bio": "3 years Elasticsearch integration in Python applications. Kibana visualisation and index optimisation.",
+          "skills": ["Elasticsearch", "Python", "Kibana", "ELK Stack", "Search Optimisation"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 2904,
+          "headline": "React Frontend Developer",
+          "bio": "Frontend developer. Not search or backend.",
+          "skills": ["React", "TypeScript", "CSS"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 2905,
+          "headline": "Junior PHP Developer",
+          "bio": "PHP beginner. No search engineering experience.",
+          "skills": ["PHP", "MySQL", "HTML"],
+          "experience_level": "junior",
+          "label": 0
+        }
+      ]
+    },
+    {
+      "id": "eval_030",
+      "split": "test",
+      "proposal": {
+        "title": "C# .NET Developer — Azure Microservices",
+        "description": "Build and maintain cloud-native microservices using C# .NET 8, Azure Service Bus, Entity Framework Core, and deploy with Azure DevOps pipelines.",
+        "required_skills": ["C#", ".NET", "Azure", "Microservices", "Entity Framework", "Azure DevOps"]
+      },
+      "candidates": [
+        {
+          "user_id": 3001,
+          "headline": "Senior C# .NET Developer — Azure",
+          "bio": "6 years .NET microservices on Azure. C# .NET 8, Azure Service Bus, EF Core, and Azure DevOps CI/CD.",
+          "skills": ["C#", ".NET", "Azure", "Microservices", "Entity Framework", "Azure DevOps"],
+          "experience_level": "senior",
+          "label": 1
+        },
+        {
+          "user_id": 3002,
+          "headline": "Java Spring Cloud Developer",
+          "bio": "Java microservices specialist. Not .NET or C#.",
+          "skills": ["Java", "Spring Boot", "Spring Cloud", "Kubernetes"],
+          "experience_level": "senior",
+          "label": 0
+        },
+        {
+          "user_id": 3003,
+          "headline": ".NET & C# Developer — 4 Years",
+          "bio": "4 years C# .NET development. Azure and Entity Framework Core.",
+          "skills": ["C#", ".NET", "Azure", "Entity Framework", "Microservices"],
+          "experience_level": "mid",
+          "label": 1
+        },
+        {
+          "user_id": 3004,
+          "headline": "Python Data Engineer",
+          "bio": "Python data engineer. Not C# or .NET.",
+          "skills": ["Python", "Airflow", "SQL", "AWS"],
+          "experience_level": "mid",
+          "label": 0
+        },
+        {
+          "user_id": 3005,
+          "headline": "WordPress Designer",
+          "bio": "Web designer. Not a developer.",
+          "skills": ["WordPress", "CSS", "Photoshop"],
+          "experience_level": "junior",
+          "label": 0
+        }
+      ]
+    }
+  ]
+}

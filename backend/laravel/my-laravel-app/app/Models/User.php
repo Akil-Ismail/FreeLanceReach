@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -14,6 +16,7 @@ class User extends Authenticatable
         'role',
         'email',
         'password',
+        'api_token',
         'phone_number',
         // Company fields
         'company_name',
@@ -34,6 +37,7 @@ class User extends Authenticatable
 
     protected $hidden = [
         'password',
+        'api_token',
     ];
 
     protected $casts = [];
@@ -54,5 +58,40 @@ class User extends Authenticatable
     public function isFreelancer(): bool
     {
         return $this->role === 'freelancer';
+    }
+
+    public function freelancerProfile(): HasOne
+    {
+        return $this->hasOne(FreelancerProfile::class);
+    }
+
+    public function companyProposals(): HasMany
+    {
+        return $this->hasMany(Proposal::class, 'company_user_id');
+    }
+
+    public function freelancerMatches(): HasMany
+    {
+        return $this->hasMany(ProposalMatch::class, 'freelancer_user_id');
+    }
+
+    public function companyMeetings(): HasMany
+    {
+        return $this->hasMany(MeetingRequest::class, 'company_user_id');
+    }
+
+    public function freelancerMeetings(): HasMany
+    {
+        return $this->hasMany(MeetingRequest::class, 'freelancer_user_id');
+    }
+
+    public function companyContracts(): HasMany
+    {
+        return $this->hasMany(Contract::class, 'company_user_id');
+    }
+
+    public function freelancerContracts(): HasMany
+    {
+        return $this->hasMany(Contract::class, 'freelancer_user_id');
     }
 }

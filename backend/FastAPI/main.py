@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import uvicorn
 
-from app.routers import vectors, health, company_chat, freelancer_chat
+from app.routers import vectors, health, company_chat, freelancer_chat, matching, proposal_generator, evaluation
 from app.services.vector_service import VectorService
 from app.services.gemini_service import get_gemini_service
 
@@ -18,21 +18,18 @@ vector_service = VectorService()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup and shutdown events"""
-    # Startup: Initialize Vector DB
-    print("🚀 Starting FastAPI server...")
-    print("📊 Initializing Qdrant vector database...")
+    print("[startup] Starting FastAPI server...")
+    print("[startup] Initializing Qdrant vector database...")
     vector_service.initialize()
-    print("✅ Vector database initialized successfully!")
-    
-    # Initialize Gemini AI
-    print("🤖 Initializing Gemini AI service...")
+    print("[startup] Vector database initialized.")
+
+    print("[startup] Initializing Gemini AI service...")
     gemini_service = get_gemini_service()
     gemini_service.initialize()
-    
+
     yield
-    
-    # Shutdown
-    print("👋 Shutting down FastAPI server...")
+
+    print("[shutdown] FastAPI server stopping...")
 
 
 app = FastAPI(
@@ -45,7 +42,16 @@ app = FastAPI(
 # CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3001",
+        "http://localhost:3002",
+        "http://127.0.0.1:3002",
+        "http://localhost:3003",
+        "http://127.0.0.1:3003",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -56,6 +62,9 @@ app.include_router(health.router, prefix="/api", tags=["Health"])
 app.include_router(vectors.router, prefix="/api/vectors", tags=["Vectors"])
 app.include_router(company_chat.router, prefix="/api/company-chat", tags=["Company Chat"])
 app.include_router(freelancer_chat.router, prefix="/api/freelancer-chat", tags=["Freelancer Chat"])
+app.include_router(matching.router, prefix="/api/matching", tags=["Matching"])
+app.include_router(proposal_generator.router, prefix="/api/proposal-generator", tags=["Proposal Generator"])
+app.include_router(evaluation.router, prefix="/api/evaluation", tags=["Evaluation"])
 
 
 @app.get("/")

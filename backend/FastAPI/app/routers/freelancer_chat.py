@@ -2,7 +2,7 @@
 Freelancer Chat Router - Chatbot for profile structuring and optimization
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import Optional, List
 
@@ -106,25 +106,86 @@ async def freelancer_chat(request: FreelancerChatRequest):
     - Set competitive rates
     """
     gemini = get_gemini_service()
-    
-    if not gemini.is_available():
-        raise HTTPException(
-            status_code=503,
-            detail="AI service not available. Please configure GEMINI_API_KEY."
-        )
-    
-    # Convert chat history to the expected format
+
     history = None
     if request.chat_history:
         history = [{"role": msg.role, "content": msg.content} for msg in request.chat_history]
-    
-    response = await gemini.chat(
-        message=request.message,
-        system_prompt=FREELANCER_SYSTEM_PROMPT,
-        chat_history=history
-    )
-    
+
+    if gemini.is_available():
+        response = await gemini.chat(
+            message=request.message,
+            system_prompt=FREELANCER_SYSTEM_PROMPT,
+            chat_history=history,
+        )
+    else:
+        response = _freelancer_fallback(request.message, history or [])
+
     return FreelancerChatResponse(response=response, success=True)
+
+
+def _freelancer_fallback(message: str, history: list) -> str:
+    """Smart static guide when Gemini is unavailable."""
+    turn = len([m for m in history if m.get("role") == "assistant"])
+    msg = message.lower()
+
+    if turn == 0:
+        return (
+            "I'll guide you through building a strong freelancer profile. Let's go one step at a time.\n\n"
+            "**Question 1 of 7:** What is your professional headline? "
+            "(e.g., *Senior React Developer*, *Freelance UI/UX Designer*, *Full-Stack Engineer*)"
+        )
+    if turn == 1:
+        return (
+            "Great headline! That will make you very searchable.\n\n"
+            "**Question 2 of 7:** What are your top skills? List them separated by commas. "
+            "(e.g., *React, TypeScript, Node.js, REST API*)"
+        )
+    if turn == 2:
+        return (
+            "Solid skill set!\n\n"
+            "**Question 3 of 7:** What is your experience level?\n"
+            "Choose one: **entry** / **intermediate** / **senior** / **expert**"
+        )
+    if turn == 3:
+        return (
+            "Noted!\n\n"
+            "**Question 4 of 7:** What is your hourly rate in USD? "
+            "(Enter a number, e.g., *45* for $45/hr)"
+        )
+    if turn == 4:
+        return (
+            "Good to know.\n\n"
+            "**Question 5 of 7:** Write 2–3 sentences for your professional bio. "
+            "Describe who you are, what you specialise in, and what you bring to clients."
+        )
+    if turn == 5:
+        return (
+            "Excellent bio!\n\n"
+            "**Question 6 of 7:** Do you have a portfolio URL or GitHub profile? "
+            "(Paste the link, or type *skip* to leave it blank)"
+        )
+    if turn == 6:
+        return (
+            "Almost done!\n\n"
+            "**Question 7 of 7:** What is your availability?\n"
+            "Choose one: **full-time** / **part-time** / **project-based**"
+        )
+
+    if any(w in msg for w in ["senior", "expert", "years", "experience"]):
+        return (
+            "With that level of experience, make sure your headline and bio reflect it clearly. "
+            "Clients filter by seniority often. Fill in the form on the right and click **Complete Setup** when ready."
+        )
+    if any(w in msg for w in ["skip", "n/a", "none", "no"]):
+        return (
+            "No problem — you can always update that later in your Profile settings. "
+            "Fill in any remaining fields on the right and click **Complete Setup** to continue."
+        )
+
+    return (
+        "You're all set! Review your details in the form on the right, make any edits, "
+        "then click **Complete Setup** to save your profile and access the platform."
+    )
 
 
 @router.get("/health")

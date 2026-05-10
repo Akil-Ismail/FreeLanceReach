@@ -83,9 +83,20 @@ export default function CompanySignupPage() {
         localStorage.setItem("authToken", response.data.token);
       }
       localStorage.setItem("userRole", "company");
+      if (response.data.user?.id) {
+        const newUserId = String(response.data.user.id);
+        localStorage.setItem("userId", newUserId);
+        localStorage.setItem(`profileSetupComplete:${newUserId}`, "false");
+        localStorage.setItem(
+          `user:profile:${newUserId}`,
+          JSON.stringify({
+            value: response.data.user,
+            savedAt: Date.now(),
+          }),
+        );
+      }
 
-      // Redirect to AI Proposal Generator (or company dashboard)
-      router.push("/ai-proposal-generator");
+      router.push("/home/setup");
     } catch (err) {
       const error = err as {
         response?: {

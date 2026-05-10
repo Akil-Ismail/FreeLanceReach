@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Sidebar } from "./Sidebar";
 
@@ -9,28 +11,54 @@ interface ProtectedLayoutProps {
 
 export const ProtectedLayout = ({ children }: ProtectedLayoutProps) => {
   const { userRole, isLoading, logout } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (isLoading || !userRole) return;
+
+    const userId = localStorage.getItem("userId");
+    const complete = userId
+      ? localStorage.getItem(`profileSetupComplete:${userId}`) === "true"
+      : false;
+
+    if (!complete && pathname !== "/home/setup") {
+      router.replace("/home/setup");
+    }
+  }, [isLoading, userRole, pathname, router]);
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-slate-950 to-slate-900">
+      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-gray-50 via-white to-red-50">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-slate-700 border-t-blue-500 rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate-400">Loading...</p>
+          <div className="w-12 h-12 border-4 border-gray-200 border-t-red-500 rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-500 text-sm">Loading...</p>
         </div>
       </div>
     );
   }
 
-  if (!userRole) {
-    return null;
+  if (!userRole) return null;
+
+  const userId =
+    typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+  const setupComplete = userId
+    ? localStorage.getItem(`profileSetupComplete:${userId}`) === "true"
+    : false;
+
+  // During setup, show minimal layout — no sidebar navigation
+  if (!setupComplete) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-red-50">
+        {children}
+      </div>
+    );
   }
 
   return (
-    <div className="flex h-screen bg-slate-950">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-red-50">
       <Sidebar role={userRole} onLogout={logout} />
-      <main className="flex-1 ml-64 overflow-auto bg-slate-950">
-        {children}
-      </main>
+      <main className="min-h-screen md:ml-64 pt-16 md:pt-0">{children}</main>
     </div>
   );
 };

@@ -3,30 +3,51 @@ Gemini AI Service for Chatbot Functionality
 """
 
 import os
+from pathlib import Path
 from typing import Optional
 import google.generativeai as genai
 from dotenv import load_dotenv
 
-load_dotenv()
+ENV_PATH = Path(__file__).resolve().parents[2] / ".env"
+load_dotenv(dotenv_path=ENV_PATH, override=True)
 
 
 class GeminiService:
     """Service for interacting with Google Gemini AI"""
     
     def __init__(self):
-        self.api_key = os.getenv("GEMINI_API_KEY")
+        raw_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or ""
+        self.api_key = raw_key.strip().strip('"').strip("'")
         self.model = None
+        self.last_error: Optional[str] = None
+
+    def _looks_like_google_api_key(self) -> bool:
+        return self.api_key.startswith("AIza") and len(self.api_key) >= 35
         
     def initialize(self):
         """Initialize the Gemini model"""
         if not self.api_key:
-            print("⚠️ Warning: GEMINI_API_KEY not set. Chatbot features will not work.")
+            self.last_error = "GEMINI_API_KEY is missing"
+            print("[gemini] WARNING: GEMINI_API_KEY not set. Chatbot features will not work.")
             return False
-        
-        genai.configure(api_key=self.api_key)
-        self.model = genai.GenerativeModel('gemini-1.5-flash')
-        print("✅ Gemini AI initialized successfully!")
-        return True
+
+        if not self._looks_like_google_api_key():
+            self.last_error = (
+                "Invalid Gemini key format. Expected a Google API key that typically starts with 'AIza'."
+            )
+            print(f"[gemini] WARNING: {self.last_error}")
+            return False
+
+        try:
+            genai.configure(api_key=self.api_key)
+            self.model = genai.GenerativeModel('gemini-1.5-flash')
+            self.last_error = None
+            print("[gemini] Gemini AI initialized successfully.")
+            return True
+        except Exception as e:
+            self.last_error = str(e)
+            print(f"[gemini] WARNING: Failed to initialize Gemini AI: {self.last_error}")
+            return False
     
     def is_available(self) -> bool:
         """Check if Gemini is properly configured"""
@@ -45,7 +66,11 @@ class GeminiService:
             The AI's response
         """
         if not self.is_available():
-            return "Error: Gemini AI is not configured. Please add your GEMINI_API_KEY to the .env file."
+            detail = self.last_error or "Gemini AI is not configured"
+            return (
+                "Error: Gemini AI is not configured correctly. "
+                f"{detail}. Please set a valid GEMINI_API_KEY in backend/FastAPI/.env."
+            )
         
         try:
             # Build the full prompt with system instructions
