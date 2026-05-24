@@ -12,6 +12,10 @@ Route::post('/register/freelancer', [UserController::class, 'registerFreelancer'
 // Public CV download — no auth so employer can open the file directly in a browser tab
 Route::get('/users/{user}/cv', [UserController::class, 'downloadCv']);
 
+// Public profile picture and cover photo — no auth so they can be used in <img> tags freely
+Route::get('/users/{user}/profile-picture', [UserController::class, 'showProfilePicture']);
+Route::get('/users/{user}/cover-photo',     [UserController::class, 'showCoverPhoto']);
+
 // Protected: all workflow and user management routes require a valid Bearer token
 Route::middleware('auth.token')->group(function () {
 
@@ -22,6 +26,8 @@ Route::middleware('auth.token')->group(function () {
     Route::put('/users/{user}', [UserController::class, 'update']);
     Route::delete('/users/{user}', [UserController::class, 'destroy']);
     Route::post('/users/{user}/cv', [UserController::class, 'uploadCv']);
+    Route::post('/users/{user}/profile-picture', [UserController::class, 'uploadProfilePicture']);
+    Route::post('/users/{user}/cover-photo',     [UserController::class, 'uploadCoverPhoto']);
 
     // Freelancer profile
     Route::post('/freelancer-profile', [PlatformWorkflowController::class, 'upsertFreelancerProfile']);

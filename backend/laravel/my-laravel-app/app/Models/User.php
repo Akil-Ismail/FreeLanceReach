@@ -33,6 +33,8 @@ class User extends Authenticatable
         'freelance_category',
         'professional_bio',
         'cv_path',
+        'profile_picture_path',
+        'cover_photo_path',
     ];
 
     protected $hidden = [

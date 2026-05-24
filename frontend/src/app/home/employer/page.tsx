@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import SectionShell from "@/components/protected/SectionShell";
+import FreelancerProfileModal from "@/components/protected/FreelancerProfileModal";
 import { getCachedValue, setCachedValue } from "@/lib/localCache";
 
 type Freelancer = {
@@ -17,6 +18,7 @@ type Freelancer = {
 export default function HomeEmployerPage() {
   const [freelancers, setFreelancers] = useState<Freelancer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -44,6 +46,10 @@ export default function HomeEmployerPage() {
   }, []);
 
   return (
+    <>
+    {selectedId !== null && (
+      <FreelancerProfileModal freelancerId={selectedId} onClose={() => setSelectedId(null)} />
+    )}
     <SectionShell
       title="Employer Home"
       description="Review suggested freelancers with profile previews and shortlist top candidates."
@@ -57,7 +63,8 @@ export default function HomeEmployerPage() {
           {freelancers.map((freelancer) => (
             <div
               key={freelancer.id}
-              className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm"
+              onClick={() => setSelectedId(freelancer.id)}
+              className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm cursor-pointer hover:shadow-md hover:border-red-200 transition"
             >
               <div className="w-11 h-11 rounded-full bg-red-100 text-red-700 font-semibold flex items-center justify-center mb-3">
                 {(freelancer.first_name?.[0] || "F").toUpperCase()}
@@ -84,5 +91,6 @@ export default function HomeEmployerPage() {
         </div>
       )}
     </SectionShell>
+    </>
   );
 }

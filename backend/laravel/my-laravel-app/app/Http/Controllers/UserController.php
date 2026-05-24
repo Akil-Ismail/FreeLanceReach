@@ -63,6 +63,7 @@ class UserController extends Controller
     // Get single user
     public function show(User $user): JsonResponse
     {
+        $user->load('freelancerProfile');
         return response()->json($user);
     }
 
@@ -225,12 +226,101 @@ class UserController extends Controller
         ]);
     }
 
+    // Upload profile picture
+    public function uploadProfilePicture(Request $request, User $user): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'picture' => 'required|image|max:5120',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
+        }
+
+        if ($user->profile_picture_path) {
+            Storage::disk('public')->delete($user->profile_picture_path);
+        }
+
+        Storage::disk('public')->makeDirectory('profile_pictures');
+
+        $ext  = $request->file('picture')->getClientOriginalExtension() ?: 'jpg';
+        $filename = $user->id . '_' . time() . '.' . $ext;
+        $path = $request->file('picture')->storeAs('profile_pictures', $filename, 'public');
+
+        if (!$path) {
+            return response()->json(['message' => 'Failed to store image on disk'], 500);
+        }
+
+        $user->profile_picture_path = $path;
+        $user->save();
+
+        return response()->json([
+            'message'      => 'Profile picture uploaded successfully',
+            'picture_path' => $path,
+        ]);
+    }
+
+    // Upload cover photo
+    public function uploadCoverPhoto(Request $request, User $user): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'cover' => 'required|image|max:10240',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
+        }
+
+        if ($user->cover_photo_path) {
+            Storage::disk('public')->delete($user->cover_photo_path);
+        }
+
+        Storage::disk('public')->makeDirectory('cover_photos');
+
+        $ext      = $request->file('cover')->getClientOriginalExtension() ?: 'jpg';
+        $filename = $user->id . '_cover_' . time() . '.' . $ext;
+        $path     = $request->file('cover')->storeAs('cover_photos', $filename, 'public');
+
+        if (!$path) {
+            return response()->json(['message' => 'Failed to store cover photo on disk'], 500);
+        }
+
+        $user->cover_photo_path = $path;
+        $user->save();
+
+        return response()->json(['message' => 'Cover photo uploaded successfully', 'cover_path' => $path]);
+    }
+
+    // Serve cover photo (public)
+    public function showCoverPhoto(User $user)
+    {
+        if (!$user->cover_photo_path || !Storage::disk('public')->exists($user->cover_photo_path)) {
+            return response()->json(['message' => 'No cover photo found'], 404);
+        }
+
+        $fullPath = storage_path('app/public/' . $user->cover_photo_path);
+        return response()->file($fullPath);
+    }
+
+    // Serve profile picture (public)
+    public function showProfilePicture(User $user)
+    {
+        if (!$user->profile_picture_path || !Storage::disk('public')->exists($user->profile_picture_path)) {
+            return response()->json(['message' => 'No profile picture found'], 404);
+        }
+
+        $fullPath = storage_path('app/public/' . $user->profile_picture_path);
+        return response()->file($fullPath);
+    }
+
     // Delete user
     public function destroy(User $user): JsonResponse
     {
-        // Delete CV if exists
         if ($user->cv_path) {
             Storage::disk('public')->delete($user->cv_path);
+        }
+        if ($user->profile_picture_path) {
+            Storage::disk('public')->delete($user->profile_picture_path);
         }
 
         $user->delete();

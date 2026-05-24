@@ -259,14 +259,30 @@ class PlatformWorkflowController extends Controller
         $allScores = array_merge($qdrantScores, $additionalScores);
         usort($allScores, fn ($a, $b) => ($b['score'] ?? 0) <=> ($a['score'] ?? 0));
 
+        // Build category lookup: user_id => freelance_category
+        $categoryMap = $allFreelancerData->pluck('freelance_category', 'user_id');
+        $proposalTitle = strtolower(trim($proposal->title ?? ''));
+
         $saved = [];
         foreach ($allScores as $item) {
             if (!isset($item['user_id'])) continue;
 
+            $score = (float) ($item['score'] ?? 0);
+
+            // Bonus: +0.40 if the freelancer's category and proposal title share a meaningful word
+            $category = strtolower(trim($categoryMap[$item['user_id']] ?? ''));
+            if ($category !== '' && $proposalTitle !== '') {
+                $titleWords    = array_filter(preg_split('/\W+/', $proposalTitle), fn ($w) => strlen($w) >= 4);
+                $categoryWords = array_filter(preg_split('/\W+/', $category),      fn ($w) => strlen($w) >= 4);
+                if (!empty(array_intersect($titleWords, $categoryWords))) {
+                    $score = min(1.0, $score + 0.40);
+                }
+            }
+
             $saved[] = ProposalMatch::updateOrCreate(
                 ['proposal_id' => $proposal->id, 'freelancer_user_id' => $item['user_id']],
                 [
-                    'match_score'  => $item['score'] ?? 0,
+                    'match_score'  => $score,
                     'model_source' => $item['model_source'] ?? 'bert',
                     'status'       => 'pending',
                 ]
@@ -772,7 +788,7 @@ class PlatformWorkflowController extends Controller
             if ($response->successful() && $response->json('contract_text')) {
                 return $response->json('contract_text');
             }
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
         }
 
         $scope = $details['scope'] ?? 'Detailed services as agreed by both parties.';

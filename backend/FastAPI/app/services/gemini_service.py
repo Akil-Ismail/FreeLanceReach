@@ -22,7 +22,7 @@ class GeminiService:
         self.last_error: Optional[str] = None
 
     def _looks_like_google_api_key(self) -> bool:
-        return self.api_key.startswith("AIza") and len(self.api_key) >= 35
+        return (self.api_key.startswith("AIza") or self.api_key.startswith("AQ.")) and len(self.api_key) >= 20
         
     def initialize(self):
         """Initialize the Gemini model"""
