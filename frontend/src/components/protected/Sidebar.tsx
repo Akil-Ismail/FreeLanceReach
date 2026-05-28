@@ -35,7 +35,7 @@ type NavItem = {
 
 const COMMON_ITEMS: NavItem[] = [
   { name: "Profile", href: "/home/profile", icon: User },
-  { name: "Proposal", href: "/home/proposal", icon: FileText },
+  { name: "Job Proposal", href: "/home/proposal", icon: FileText },
   { name: "Chatbot", href: "/home/chatbot", icon: MessageSquare },
   { name: "Matching", href: "/home/matching", icon: Layers3 },
   { name: "Approvals", href: "/home/approvals", icon: CheckCircle2 },

@@ -88,7 +88,7 @@ export default function AIProposalGeneratorPage() {
       setIsFallback(response.data.fallback === true);
     } catch {
       setError(
-        "Could not generate proposal. Make sure the AI service is running and GEMINI_API_KEY is configured.",
+        "Could not generate proposal. Make sure the AI service is running and GROQ_API_KEY is configured.",
       );
     } finally {
       setIsGenerating(false);
@@ -218,7 +218,7 @@ export default function AIProposalGeneratorPage() {
             {isFallback && proposalText && (
               <div className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
                 AI service unavailable — showing a template proposal. Configure
-                GEMINI_API_KEY for full AI generation.
+                GROQ_API_KEY for full AI generation.
               </div>
             )}
 

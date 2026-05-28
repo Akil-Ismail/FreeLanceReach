@@ -16,19 +16,19 @@ class GeminiService:
     """Service for interacting with Google Gemini AI"""
     
     def __init__(self):
-        raw_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or ""
+        raw_key = os.getenv("GROQ_API_KEY") or os.getenv("GOOGLE_API_KEY") or ""
         self.api_key = raw_key.strip().strip('"').strip("'")
         self.model = None
         self.last_error: Optional[str] = None
 
     def _looks_like_google_api_key(self) -> bool:
-        return (self.api_key.startswith("AIza") or self.api_key.startswith("AQ.")) and len(self.api_key) >= 20
+        return len(self.api_key) >= 20
         
     def initialize(self):
         """Initialize the Gemini model"""
         if not self.api_key:
-            self.last_error = "GEMINI_API_KEY is missing"
-            print("[gemini] WARNING: GEMINI_API_KEY not set. Chatbot features will not work.")
+            self.last_error = "GROQ_API_KEY is missing"
+            print("[gemini] WARNING: GROQ_API_KEY not set. Chatbot features will not work.")
             return False
 
         if not self._looks_like_google_api_key():
@@ -40,7 +40,7 @@ class GeminiService:
 
         try:
             genai.configure(api_key=self.api_key)
-            self.model = genai.GenerativeModel('gemini-1.5-flash')
+            self.model = genai.GenerativeModel('gemini-2.0-flash')
             self.last_error = None
             print("[gemini] Gemini AI initialized successfully.")
             return True
@@ -51,6 +51,8 @@ class GeminiService:
     
     def is_available(self) -> bool:
         """Check if Gemini is properly configured"""
+        if self.model is None:
+            self.initialize()
         return self.model is not None
     
     async def chat(self, message: str, system_prompt: str, chat_history: Optional[list] = None) -> str:
@@ -69,7 +71,7 @@ class GeminiService:
             detail = self.last_error or "Gemini AI is not configured"
             return (
                 "Error: Gemini AI is not configured correctly. "
-                f"{detail}. Please set a valid GEMINI_API_KEY in backend/FastAPI/.env."
+                f"{detail}. Please set a valid GROQ_API_KEY in backend/FastAPI/.env."
             )
         
         try:
@@ -113,4 +115,5 @@ def get_gemini_service() -> GeminiService:
     global _gemini_service
     if _gemini_service is None:
         _gemini_service = GeminiService()
+        _gemini_service.initialize()
     return _gemini_service

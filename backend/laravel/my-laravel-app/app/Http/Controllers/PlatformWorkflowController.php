@@ -87,7 +87,8 @@ class PlatformWorkflowController extends Controller
                     'last_name'          => $profileUser->last_name ?? null,
                 ]
             );
-        } catch (\Throwable) {}
+        } catch (\Throwable) {
+        }
 
         // Re-run matching for all open proposals so this new freelancer is considered
         Proposal::where('status', 'open')->each(function ($proposal) {
@@ -209,11 +210,12 @@ class PlatformWorkflowController extends Controller
                 $qdrantScores = $resp->json('matches', []);
                 $qdrantUserIds = array_column($qdrantScores, 'user_id');
             }
-        } catch (\Throwable) {}
+        } catch (\Throwable) {
+        }
 
         // 2. Score freelancers not yet in Qdrant via direct BERT, then index them
         $indexed = array_flip($qdrantUserIds);
-        $missing = $allFreelancerData->filter(fn ($f) => !array_key_exists($f['user_id'], $indexed));
+        $missing = $allFreelancerData->filter(fn($f) => !array_key_exists($f['user_id'], $indexed));
 
         $additionalScores = [];
         if ($missing->isNotEmpty()) {
@@ -228,15 +230,16 @@ class PlatformWorkflowController extends Controller
                 if ($resp->successful()) {
                     $additionalScores = $resp->json('matches', []);
                 }
-            } catch (\Throwable) {}
+            } catch (\Throwable) {
+            }
 
             // Jaccard final fallback for missing
             if (empty($additionalScores)) {
                 $reqSkills = collect($proposal->required_skills ?? [])
-                    ->map(fn ($s) => strtolower(trim($s)))->filter();
+                    ->map(fn($s) => strtolower(trim($s)))->filter();
 
                 $additionalScores = collect($missingList)->map(function ($f) use ($reqSkills) {
-                    $pSkills = collect($f['skills'] ?? [])->map(fn ($s) => strtolower(trim($s)))->filter();
+                    $pSkills = collect($f['skills'] ?? [])->map(fn($s) => strtolower(trim($s)))->filter();
                     $intersection = $reqSkills->intersect($pSkills)->count();
                     $union = $reqSkills->merge($pSkills)->unique()->count();
                     return [
@@ -251,7 +254,8 @@ class PlatformWorkflowController extends Controller
             foreach ($missingList as $f) {
                 try {
                     Http::timeout(10)->post("{$fastApiBase}/matching/index-profile", $f);
-                } catch (\Throwable) {}
+                } catch (\Throwable) {
+                }
             }
         }
 
@@ -260,7 +264,7 @@ class PlatformWorkflowController extends Controller
 
         // Re-rank the full candidate list using multi-signal scoring (semantic + skill F1 + budget + experience + availability)
         $scoredUserIds  = array_column($allScores, 'user_id');
-        $rerankPayloads = $allFreelancerData->filter(fn ($f) => in_array($f['user_id'], $scoredUserIds))->values()->all();
+        $rerankPayloads = $allFreelancerData->filter(fn($f) => in_array($f['user_id'], $scoredUserIds))->values()->all();
 
         if (!empty($rerankPayloads)) {
             try {
@@ -273,7 +277,7 @@ class PlatformWorkflowController extends Controller
                 }
             } catch (\Throwable) {
                 // fallback: keep existing scores, just sort them
-                usort($allScores, fn ($a, $b) => ($b['score'] ?? 0) <=> ($a['score'] ?? 0));
+                usort($allScores, fn($a, $b) => ($b['score'] ?? 0) <=> ($a['score'] ?? 0));
             }
         }
 
@@ -330,7 +334,7 @@ class PlatformWorkflowController extends Controller
         if ($actor->role === 'freelancer') {
             $query->where('freelancer_user_id', $actor->id);
         } else {
-            $query->whereHas('proposal', fn ($q) => $q->where('company_user_id', $actor->id));
+            $query->whereHas('proposal', fn($q) => $q->where('company_user_id', $actor->id));
         }
 
         return response()->json($query->latest()->get());
