@@ -58,7 +58,7 @@ export const ProtectedLayout = ({ children }: ProtectedLayoutProps) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-red-50">
       <Sidebar role={userRole} onLogout={logout} />
-      <main className="min-h-screen md:ml-64 pt-16 md:pt-0">{children}</main>
+      <main className="min-h-screen md:ml-64 pt-16 md:pt-14">{children}</main>
     </div>
   );
 };

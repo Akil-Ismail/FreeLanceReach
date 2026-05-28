@@ -57,6 +57,25 @@ class SearchRequest(BaseModel):
     top_k: int = 20
 
 
+class RerankRequest(BaseModel):
+    proposal: ProposalPayload
+    freelancers: List[FreelancerPayload]
+
+
+@router.post("/rerank")
+async def rerank_freelancers(request: RerankRequest) -> Dict[str, Any]:
+    service = get_bert_matching_service()
+    matches = service.rerank(
+        proposal=request.proposal.model_dump(),
+        freelancers=[f.model_dump() for f in request.freelancers],
+    )
+    return {
+        "matches": matches,
+        "model": "bert_mpnet_multisignal" if service.is_transformer_available() else "fallback_overlap",
+        "count": len(matches),
+    }
+
+
 @router.post("/bert-score")
 async def bert_score(request: MatchingRequest) -> Dict[str, Any]:
     service = get_bert_matching_service()

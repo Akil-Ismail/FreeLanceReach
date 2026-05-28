@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Plus, Zap, RefreshCw } from "lucide-react";
 import api from "@/lib/api";
 import SectionShell from "@/components/protected/SectionShell";
+import SearchBar from "@/components/protected/SearchBar";
 import Modal from "@/components/protected/Modal";
 
 type Proposal = {
@@ -52,6 +53,7 @@ export default function HomeProposalPage() {
     text: string;
   } | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [query, setQuery] = useState("");
 
   const showToast = (type: "success" | "error", text: string) => {
     setToast({ type, text });
@@ -154,6 +156,8 @@ export default function HomeProposalPage() {
           ) : undefined
         }
       >
+        <SearchBar value={query} onChange={setQuery} placeholder="Search by title, skill, or description…" />
+
         {/* Toast */}
         {toast && (
           <div
@@ -177,19 +181,25 @@ export default function HomeProposalPage() {
             <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center text-gray-400 text-sm">
               Loading...
             </div>
-          ) : proposals.length === 0 ? (
+          ) : proposals.filter((p) => {
+              const q = query.trim().toLowerCase();
+              return !q || p.title.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || (p.required_skills || []).some((s) => s.toLowerCase().includes(q));
+            }).length === 0 ? (
             <div className="bg-white border border-gray-200 rounded-2xl p-10 flex flex-col items-center gap-3 text-center">
               <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
                 <Plus className="w-6 h-6 text-gray-400" />
               </div>
               <p className="text-sm text-gray-500">
-                {role === "company"
+                {query ? `No proposals match "${query}".` : role === "company"
                   ? "No proposals yet. Use the + button to post your first job."
                   : "No open proposals right now. Check back soon."}
               </p>
             </div>
           ) : (
-            proposals.map((proposal) => (
+            proposals.filter((p) => {
+              const q = query.trim().toLowerCase();
+              return !q || p.title.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || (p.required_skills || []).some((s) => s.toLowerCase().includes(q));
+            }).map((proposal) => (
               <div
                 key={proposal.id}
                 className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:border-gray-300 transition"

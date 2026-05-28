@@ -106,28 +106,34 @@ export const Sidebar = ({ role, onLogout }: SidebarProps) => {
     </>
   );
 
+  const currentPage = navItems.find((item) => pathname === item.href)?.name ?? "";
+
   return (
     <>
+      {/* Mobile top bar — hamburger | page name | logo */}
       <header className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur border-b border-gray-100 h-16 px-4 flex items-center justify-between">
-        <Link href={homePath} className="flex items-center">
-          <Image
-            src={logo}
-            alt="FreelanceReach Logo"
-            className="h-10 w-auto"
-            priority
-          />
-        </Link>
-        <button
-          onClick={() => setMobileOpen((prev) => !prev)}
-          className="p-2 rounded-lg hover:bg-gray-100 text-gray-700"
-          aria-label="Toggle navigation menu"
-        >
-          {mobileOpen ? (
-            <X className="w-5 h-5" />
-          ) : (
-            <Menu className="w-5 h-5" />
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setMobileOpen((prev) => !prev)}
+            className="p-2 rounded-lg hover:bg-gray-100 text-gray-700"
+            aria-label="Toggle navigation menu"
+          >
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+          {currentPage && (
+            <span className="text-sm font-semibold text-gray-800">{currentPage}</span>
           )}
-        </button>
+        </div>
+        <Link href={homePath} className="flex items-center">
+          <Image src={logo} alt="FreelanceReach Logo" className="h-10 w-auto" priority />
+        </Link>
+      </header>
+
+      {/* Desktop top bar */}
+      <header className="hidden md:flex fixed top-0 left-64 right-0 z-30 bg-white/95 backdrop-blur border-b border-gray-100 h-14 px-6 items-center">
+        {currentPage && (
+          <span className="text-sm font-semibold text-gray-800">{currentPage}</span>
+        )}
       </header>
 
       {mobileOpen && (

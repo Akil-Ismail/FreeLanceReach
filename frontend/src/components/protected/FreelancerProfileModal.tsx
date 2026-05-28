@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import api from "@/lib/api";
 import {
   X, Briefcase, Globe, Clock, DollarSign, Phone, Mail,
-  FileText, ExternalLink, Building2,
+  FileText, ExternalLink, Building2, Send,
 } from "lucide-react";
 
 type UserData = {
@@ -76,9 +76,31 @@ interface Props {
   onClose: () => void;
 }
 
+type OfferForm = {
+  title: string;
+  description: string;
+  required_skills: string;
+  budget_min: string;
+  budget_max: string;
+  timeline: string;
+};
+
+const EMPTY_OFFER: OfferForm = {
+  title: "", description: "", required_skills: "",
+  budget_min: "", budget_max: "", timeline: "",
+};
+
 export default function FreelancerProfileModal({ freelancerId, onClose }: Props) {
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showOfferForm, setShowOfferForm] = useState(false);
+  const [offerForm, setOfferForm] = useState<OfferForm>(EMPTY_OFFER);
+  const [offerSubmitting, setOfferSubmitting] = useState(false);
+  const [offerError, setOfferError] = useState<string | null>(null);
+  const [offerSuccess, setOfferSuccess] = useState(false);
+
+  const viewerRole = typeof window !== "undefined" ? localStorage.getItem("userRole") : null;
+  const viewerUserId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -99,6 +121,35 @@ export default function FreelancerProfileModal({ freelancerId, onClose }: Props)
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
 
+  const handleSendOffer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!viewerUserId) return;
+    setOfferSubmitting(true);
+    setOfferError(null);
+    try {
+      await api.post("/proposals", {
+        actor_user_id: Number(viewerUserId),
+        company_user_id: Number(viewerUserId),
+        title: offerForm.title,
+        description: offerForm.description,
+        required_skills: offerForm.required_skills
+          ? offerForm.required_skills.split(",").map((s) => s.trim()).filter(Boolean)
+          : [],
+        budget_min: offerForm.budget_min ? Number(offerForm.budget_min) : undefined,
+        budget_max: offerForm.budget_max ? Number(offerForm.budget_max) : undefined,
+        timeline: offerForm.timeline || undefined,
+        status: "open",
+      });
+      setOfferSuccess(true);
+      setOfferForm(EMPTY_OFFER);
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      setOfferError(msg || "Failed to send offer. Please try again.");
+    } finally {
+      setOfferSubmitting(false);
+    }
+  };
+
   const fp = user?.freelancer_profile;
   const isFreelancer = user?.role === "freelancer";
 
@@ -109,6 +160,15 @@ export default function FreelancerProfileModal({ freelancerId, onClose }: Props)
   const initials = isFreelancer
     ? `${(user?.first_name || "?")[0]}${(user?.last_name || "?")[0]}`.toUpperCase()
     : `${(user?.company_name || "?")[0]}`.toUpperCase();
+
+  const offerRef = useRef<HTMLDivElement>(null);
+
+  const scrollToOffer = () => {
+    setShowOfferForm(true);
+    setOfferSuccess(false);
+    setOfferError(null);
+    setTimeout(() => offerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+  };
 
   return (
     /* Backdrop */
@@ -141,20 +201,21 @@ export default function FreelancerProfileModal({ freelancerId, onClose }: Props)
             {/* ── Header card ── */}
             <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
               {/* Cover photo */}
-              <div
-                className="relative h-32 sm:h-40 overflow-hidden"
-                style={user.cover_photo_path
-                  ? { backgroundImage: `url(http://localhost:8000/api/users/${user.id}/cover-photo)`, backgroundSize: "cover", backgroundPosition: "center" }
-                  : undefined}
-              >
-                {!user.cover_photo_path && (
+              <div className="relative h-32 sm:h-40">
+                {user.cover_photo_path ? (
+                  <img
+                    src={`http://localhost:8000/api/users/${user.id}/cover-photo`}
+                    alt="cover"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                ) : (
                   <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-700" />
                 )}
               </div>
 
               <div className="px-6 pb-3">
                 {/* Profile picture + CV button row */}
-                <div className="-mt-10 mb-3 flex items-end justify-between">
+                <div className="-mt-10 mb-3 flex items-end justify-between relative z-10">
                   <div className="w-20 h-20 rounded-full border-4 border-white shadow-lg overflow-hidden shrink-0">
                     {user.profile_picture_path ? (
                       <img
@@ -168,16 +229,26 @@ export default function FreelancerProfileModal({ freelancerId, onClose }: Props)
                       </div>
                     )}
                   </div>
-                  {user.cv_path && (
-                    <a
-                      href={`http://localhost:8000/api/users/${user.id}/cv`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn text-xs px-3 py-1.5 flex items-center gap-1.5"
-                    >
-                      <FileText className="w-3.5 h-3.5" /> View CV
-                    </a>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {user.cv_path && (
+                      <a
+                        href={`http://localhost:8000/api/users/${user.id}/cv`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn text-xs px-3 py-1.5 flex items-center gap-1.5"
+                      >
+                        <FileText className="w-3.5 h-3.5" /> View CV
+                      </a>
+                    )}
+                    {viewerRole === "company" && isFreelancer && (
+                      <button
+                        onClick={scrollToOffer}
+                        className="btn text-xs px-3 py-1.5 flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white border-0"
+                      >
+                        <Send className="w-3.5 h-3.5" /> Send Offer
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -282,6 +353,108 @@ export default function FreelancerProfileModal({ freelancerId, onClose }: Props)
                   )}
                 </div>
               </Section>
+            )}
+
+            {/* ── Send Offer Form ── */}
+            {showOfferForm && viewerRole === "company" && (
+              <div ref={offerRef}>
+              <Section title="Send Offer" icon={<Send className="w-4 h-4" />}>
+                {offerSuccess ? (
+                  <div className="text-center py-4">
+                    <p className="text-green-600 font-semibold">Offer sent successfully!</p>
+                    <p className="text-gray-500 text-sm mt-1">AI matching will run automatically to rank candidates.</p>
+                    <button
+                      onClick={() => { setOfferSuccess(false); setShowOfferForm(false); }}
+                      className="mt-4 btn text-xs px-4 py-1.5"
+                    >Close</button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSendOffer} className="space-y-4">
+                    {offerError && (
+                      <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-lg px-3 py-2">{offerError}</p>
+                    )}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Job Title <span className="text-red-500">*</span></label>
+                      <input
+                        required
+                        value={offerForm.title}
+                        onChange={(e) => setOfferForm((f) => ({ ...f, title: e.target.value }))}
+                        placeholder="e.g. Frontend Developer for E-commerce App"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Description <span className="text-red-500">*</span></label>
+                      <textarea
+                        required
+                        rows={4}
+                        value={offerForm.description}
+                        onChange={(e) => setOfferForm((f) => ({ ...f, description: e.target.value }))}
+                        placeholder="Describe the project, responsibilities, and expectations..."
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Required Skills</label>
+                      <input
+                        value={offerForm.required_skills}
+                        onChange={(e) => setOfferForm((f) => ({ ...f, required_skills: e.target.value }))}
+                        placeholder="React, TypeScript, Node.js (comma-separated)"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">Budget Min ($)</label>
+                        <input
+                          type="number" min="0"
+                          value={offerForm.budget_min}
+                          onChange={(e) => setOfferForm((f) => ({ ...f, budget_min: e.target.value }))}
+                          placeholder="500"
+                          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">Budget Max ($)</label>
+                        <input
+                          type="number" min="0"
+                          value={offerForm.budget_max}
+                          onChange={(e) => setOfferForm((f) => ({ ...f, budget_max: e.target.value }))}
+                          placeholder="2000"
+                          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Timeline</label>
+                      <input
+                        value={offerForm.timeline}
+                        onChange={(e) => setOfferForm((f) => ({ ...f, timeline: e.target.value }))}
+                        placeholder="e.g. 2 weeks, 1 month"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                      />
+                    </div>
+                    <div className="flex justify-end gap-2 pt-1">
+                      <button type="button" onClick={() => setShowOfferForm(false)} className="btn-secondary text-xs px-4 py-1.5">
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={offerSubmitting}
+                        className="btn text-xs px-4 py-1.5 flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white border-0 disabled:opacity-60"
+                      >
+                        {offerSubmitting ? (
+                          <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Send className="w-3.5 h-3.5" />
+                        )}
+                        {offerSubmitting ? "Sending…" : "Send Offer"}
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </Section>
+              </div>
             )}
 
             {/* ── Contact ── */}

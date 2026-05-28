@@ -255,35 +255,37 @@ class PlatformWorkflowController extends Controller
             }
         }
 
-        // Merge Qdrant + direct BERT results and sort by score desc
+        // Merge Qdrant + direct BERT results
         $allScores = array_merge($qdrantScores, $additionalScores);
-        usort($allScores, fn ($a, $b) => ($b['score'] ?? 0) <=> ($a['score'] ?? 0));
 
-        // Build category lookup: user_id => freelance_category
-        $categoryMap = $allFreelancerData->pluck('freelance_category', 'user_id');
-        $proposalTitle = strtolower(trim($proposal->title ?? ''));
+        // Re-rank the full candidate list using multi-signal scoring (semantic + skill F1 + budget + experience + availability)
+        $scoredUserIds  = array_column($allScores, 'user_id');
+        $rerankPayloads = $allFreelancerData->filter(fn ($f) => in_array($f['user_id'], $scoredUserIds))->values()->all();
+
+        if (!empty($rerankPayloads)) {
+            try {
+                $resp = Http::timeout(60)->post(
+                    "{$fastApiBase}/matching/rerank",
+                    ['proposal' => $proposalData, 'freelancers' => $rerankPayloads]
+                );
+                if ($resp->successful() && !empty($resp->json('matches'))) {
+                    $allScores = $resp->json('matches');
+                }
+            } catch (\Throwable) {
+                // fallback: keep existing scores, just sort them
+                usort($allScores, fn ($a, $b) => ($b['score'] ?? 0) <=> ($a['score'] ?? 0));
+            }
+        }
 
         $saved = [];
         foreach ($allScores as $item) {
             if (!isset($item['user_id'])) continue;
 
-            $score = (float) ($item['score'] ?? 0);
-
-            // Bonus: +0.40 if the freelancer's category and proposal title share a meaningful word
-            $category = strtolower(trim($categoryMap[$item['user_id']] ?? ''));
-            if ($category !== '' && $proposalTitle !== '') {
-                $titleWords    = array_filter(preg_split('/\W+/', $proposalTitle), fn ($w) => strlen($w) >= 4);
-                $categoryWords = array_filter(preg_split('/\W+/', $category),      fn ($w) => strlen($w) >= 4);
-                if (!empty(array_intersect($titleWords, $categoryWords))) {
-                    $score = min(1.0, $score + 0.40);
-                }
-            }
-
             $saved[] = ProposalMatch::updateOrCreate(
                 ['proposal_id' => $proposal->id, 'freelancer_user_id' => $item['user_id']],
                 [
-                    'match_score'  => $score,
-                    'model_source' => $item['model_source'] ?? 'bert',
+                    'match_score'  => min(1.0, max(0.0, (float) ($item['score'] ?? 0))),
+                    'model_source' => $item['model_source'] ?? 'bert_mpnet_multisignal',
                     'status'       => 'pending',
                 ]
             );
@@ -339,6 +341,7 @@ class PlatformWorkflowController extends Controller
         $validator = Validator::make($request->all(), [
             'actor_user_id' => 'required|exists:users,id',
             'approve' => 'required|boolean',
+            'remove_approval' => 'sometimes|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -368,6 +371,30 @@ class PlatformWorkflowController extends Controller
 
         if (!in_array($actor->role, ['company', 'freelancer'])) {
             return response()->json(['message' => 'Invalid actor role for match response'], 403);
+        }
+
+        if (!empty($data['remove_approval'])) {
+            if ($actor->role === 'company') {
+                if ($match->status === 'company_approved') {
+                    $match->status = 'pending';
+                } elseif ($match->status === 'mutual_approved') {
+                    $match->status = 'freelancer_approved';
+                } else {
+                    return response()->json(['message' => 'Company cannot remove approval for this match status'], 422);
+                }
+            } else {
+                if ($match->status === 'freelancer_approved') {
+                    $match->status = 'pending';
+                } elseif ($match->status === 'mutual_approved') {
+                    $match->status = 'company_approved';
+                } else {
+                    return response()->json(['message' => 'Freelancer cannot remove approval for this match status'], 422);
+                }
+            }
+
+            $match->save();
+
+            return response()->json(['message' => 'Approval removed', 'match' => $match]);
         }
 
         if (!$data['approve']) {
