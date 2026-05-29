@@ -204,45 +204,28 @@ export default function HomeProposalPage() {
                 key={proposal.id}
                 className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:border-gray-300 transition"
               >
-                <div className="flex items-start justify-between gap-4 flex-wrap">
+                {/* Desktop: side-by-side | Mobile: stacked */}
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       <h3 className="text-sm font-semibold text-gray-900 truncate">
                         {proposal.title}
                       </h3>
-                      <span
-                        className={`text-xs font-medium px-2 py-0.5 rounded-full capitalize ${
-                          STATUS_STYLE[proposal.status] ||
-                          "bg-gray-100 text-gray-500"
-                        }`}
-                      >
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full capitalize shrink-0 ${STATUS_STYLE[proposal.status] || "bg-gray-100 text-gray-500"}`}>
                         {proposal.status}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 line-clamp-2">
-                      {proposal.description}
-                    </p>
-
+                    <p className="text-sm text-gray-600 line-clamp-2">{proposal.description}</p>
                     <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400">
-                      {(proposal.budget_min != null ||
-                        proposal.budget_max != null) && (
-                        <span>
-                          Budget: ${proposal.budget_min ?? "?"} – $
-                          {proposal.budget_max ?? "?"}
-                        </span>
+                      {(proposal.budget_min != null || proposal.budget_max != null) && (
+                        <span>Budget: ${proposal.budget_min ?? "?"} – ${proposal.budget_max ?? "?"}</span>
                       )}
-                      {proposal.timeline && (
-                        <span>Timeline: {proposal.timeline}</span>
-                      )}
+                      {proposal.timeline && <span>Timeline: {proposal.timeline}</span>}
                     </div>
-
                     {proposal.required_skills?.length ? (
                       <div className="mt-2.5 flex flex-wrap gap-1.5">
                         {proposal.required_skills.map((skill) => (
-                          <span
-                            key={skill}
-                            className="text-xs px-2 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-100"
-                          >
+                          <span key={skill} className="text-xs px-2 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-100">
                             {skill}
                           </span>
                         ))}
@@ -250,7 +233,8 @@ export default function HomeProposalPage() {
                     ) : null}
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                  {/* Actions: right side on desktop, below on mobile */}
+                  <div className="flex sm:flex-col items-start gap-2 shrink-0 sm:pt-0.5 flex-wrap">
                     {proposal.status === "matched" && (
                       <span className="text-xs text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full flex items-center gap-1">
                         <Zap className="w-3 h-3" /> AI Matched
@@ -262,12 +246,8 @@ export default function HomeProposalPage() {
                         disabled={rematchId === proposal.id}
                         className="text-xs text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-100 px-2.5 py-1 rounded-full flex items-center gap-1 transition disabled:opacity-50"
                       >
-                        <RefreshCw
-                          className={`w-3 h-3 ${rematchId === proposal.id ? "animate-spin" : ""}`}
-                        />
-                        {rematchId === proposal.id
-                          ? "Matching…"
-                          : "Re-run Matching"}
+                        <RefreshCw className={`w-3 h-3 ${rematchId === proposal.id ? "animate-spin" : ""}`} />
+                        {rematchId === proposal.id ? "Matching…" : "Re-run Matching"}
                       </button>
                     )}
                   </div>

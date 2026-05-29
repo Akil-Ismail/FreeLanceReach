@@ -2,7 +2,9 @@
 Freelancer Chat Router - Chatbot for profile structuring and optimization
 """
 
-from fastapi import APIRouter
+import os
+import httpx
+from fastapi import APIRouter, Header
 from pydantic import BaseModel
 from typing import Optional, List
 
@@ -10,75 +12,60 @@ from app.services.gemini_service import get_gemini_service
 
 router = APIRouter()
 
-# System prompt for freelancer chatbot
+LARAVEL_URL = os.getenv("LARAVEL_URL", "http://127.0.0.1:8000/api")
+
 FREELANCER_SYSTEM_PROMPT = """
-You are a Professional Profile Coach for freelancers on a freelancing platform. Your purpose is to help freelancers create compelling, well-structured profiles that attract clients and win projects.
+You are a Professional Profile Coach for freelancers on a freelancing platform. Your job is to collect all necessary profile information by asking questions one at a time, then confirm with the user before updating.
 
-YOUR RESPONSIBILITIES:
-- Help freelancers write professional profile headlines
-- Assist in crafting compelling bio/summary sections
-- Guide them in showcasing their skills effectively
-- Help structure their portfolio descriptions
-- Advise on presenting work experience
-- Suggest how to highlight achievements and certifications
-- Help write professional overview sections
-- Guide on setting appropriate hourly rates
-- Assist with profile completeness and optimization
+FOLLOW THIS EXACT FLOW — ask ONE question at a time, wait for the answer, then move to the next:
 
-PROFILE COMPONENTS YOU HELP WITH:
+1. First name & last name
+2. Professional headline (e.g. "Senior React Developer | 5 years exp")
+3. Top skills (comma-separated list)
+4. Experience level (entry / intermediate / senior / expert)
+5. Hourly rate in USD
+6. Professional bio (2-3 sentences)
+7. Portfolio URL or GitHub (or "skip")
+8. Availability (full-time / part-time / project-based)
 
-1. PROFESSIONAL HEADLINE
-   - Concise, impactful title (e.g., "Senior Full-Stack Developer | React & Node.js Expert")
-   - Should include main skill and specialization
-   - Searchable keywords
+After collecting ALL 8 answers, summarise everything clearly and ask:
+"Does everything look good? Type 'yes' to update your profile or let me know what to change."
 
-2. PROFILE SUMMARY/BIO
-   - Introduction that captures attention
-   - Key skills and expertise
-   - Years of experience
-   - What makes them unique
-   - Call to action
-
-3. SKILLS SECTION
-   - Primary skills (main expertise)
-   - Secondary skills (complementary)
-   - Tools and technologies
-   - Soft skills
-
-4. WORK EXPERIENCE
-   - Relevant past projects
-   - Achievements with metrics
-   - Client testimonials approach
-
-5. PORTFOLIO
-   - How to describe projects
-   - Highlighting impact and results
-   - Showcasing best work
-
-6. EDUCATION & CERTIFICATIONS
-   - Relevant qualifications
-   - Professional certifications
-   - Continuous learning
-
-7. RATE SETTING
-   - Market rate guidance
-   - Value-based pricing
-   - Experience-based adjustments
-
-RESPONSE GUIDELINES:
-- Be encouraging and supportive
-- Provide specific, actionable advice
-- Help them stand out from competition
-- Focus on their unique value proposition
-- Use industry best practices
-- Give examples when helpful
-
-Always aim to help freelancers present their best professional selves while remaining authentic and accurate about their skills and experience.
+IMPORTANT:
+- Ask only ONE question per message
+- Be encouraging and give examples for each field
+- Do NOT skip any field
+- Do NOT show a summary until you have all 8 answers
+- When the user confirms, end your message with the exact tag: [PROFILE_READY]
 """
 
 
+def _build_system_prompt(profile: Optional[dict]) -> str:
+    if not profile:
+        return FREELANCER_SYSTEM_PROMPT
+    lines = [FREELANCER_SYSTEM_PROMPT, "\n---\nCURRENT USER PROFILE (use this context to give personalised advice):"]
+    for k, v in profile.items():
+        if v not in (None, "", [], {}):
+            lines.append(f"- {k.replace('_', ' ').title()}: {v}")
+    return "\n".join(lines)
+
+
+async def _fetch_profile(token: str) -> Optional[dict]:
+    try:
+        async with httpx.AsyncClient(timeout=5) as client:
+            r = await client.get(
+                f"{LARAVEL_URL}/chat/profile",
+                headers={"Authorization": f"Bearer {token}"},
+            )
+            if r.status_code == 200:
+                return r.json().get("profile")
+    except Exception:
+        pass
+    return None
+
+
 class ChatMessage(BaseModel):
-    role: str  # "user" or "assistant"
+    role: str
     content: str
 
 
@@ -93,28 +80,24 @@ class FreelancerChatResponse(BaseModel):
 
 
 @router.post("/chat", response_model=FreelancerChatResponse)
-async def freelancer_chat(request: FreelancerChatRequest):
-    """
-    Freelancer chatbot endpoint for profile structuring
-    
-    This chatbot helps freelancers:
-    - Create professional headlines
-    - Write compelling bios and summaries
-    - Structure their skills section
-    - Describe portfolio projects
-    - Present work experience effectively
-    - Set competitive rates
-    """
-    gemini = get_gemini_service()
+async def freelancer_chat(
+    request: FreelancerChatRequest,
+    authorization: Optional[str] = Header(None),
+):
+    groq = get_gemini_service()
+
+    token = authorization.removeprefix("Bearer ").strip() if authorization else ""
+    profile = await _fetch_profile(token) if token else None
+    system_prompt = _build_system_prompt(profile)
 
     history = None
     if request.chat_history:
         history = [{"role": msg.role, "content": msg.content} for msg in request.chat_history]
 
-    if gemini.is_available():
-        response = await gemini.chat(
+    if groq.is_available():
+        response = await groq.chat(
             message=request.message,
-            system_prompt=FREELANCER_SYSTEM_PROMPT,
+            system_prompt=system_prompt,
             chat_history=history,
         )
     else:
@@ -124,7 +107,6 @@ async def freelancer_chat(request: FreelancerChatRequest):
 
 
 def _freelancer_fallback(message: str, history: list) -> str:
-    """Smart static guide when Gemini is unavailable."""
     turn = len([m for m in history if m.get("role") == "assistant"])
     msg = message.lower()
 
@@ -137,8 +119,7 @@ def _freelancer_fallback(message: str, history: list) -> str:
     if turn == 1:
         return (
             "Great headline! That will make you very searchable.\n\n"
-            "**Question 2 of 7:** What are your top skills? List them separated by commas. "
-            "(e.g., *React, TypeScript, Node.js, REST API*)"
+            "**Question 2 of 7:** What are your top skills? List them separated by commas."
         )
     if turn == 2:
         return (
@@ -149,20 +130,17 @@ def _freelancer_fallback(message: str, history: list) -> str:
     if turn == 3:
         return (
             "Noted!\n\n"
-            "**Question 4 of 7:** What is your hourly rate in USD? "
-            "(Enter a number, e.g., *45* for $45/hr)"
+            "**Question 4 of 7:** What is your hourly rate in USD?"
         )
     if turn == 4:
         return (
             "Good to know.\n\n"
-            "**Question 5 of 7:** Write 2–3 sentences for your professional bio. "
-            "Describe who you are, what you specialise in, and what you bring to clients."
+            "**Question 5 of 7:** Write 2–3 sentences for your professional bio."
         )
     if turn == 5:
         return (
             "Excellent bio!\n\n"
-            "**Question 6 of 7:** Do you have a portfolio URL or GitHub profile? "
-            "(Paste the link, or type *skip* to leave it blank)"
+            "**Question 6 of 7:** Do you have a portfolio URL or GitHub profile? (or type *skip*)"
         )
     if turn == 6:
         return (
@@ -172,28 +150,89 @@ def _freelancer_fallback(message: str, history: list) -> str:
         )
 
     if any(w in msg for w in ["senior", "expert", "years", "experience"]):
-        return (
-            "With that level of experience, make sure your headline and bio reflect it clearly. "
-            "Clients filter by seniority often. Fill in the form on the right and click **Complete Setup** when ready."
-        )
+        return "With that level of experience, make sure your headline and bio reflect it clearly."
     if any(w in msg for w in ["skip", "n/a", "none", "no"]):
-        return (
-            "No problem — you can always update that later in your Profile settings. "
-            "Fill in any remaining fields on the right and click **Complete Setup** to continue."
-        )
+        return "No problem — you can always update that later in your Profile settings."
 
-    return (
-        "You're all set! Review your details in the form on the right, make any edits, "
-        "then click **Complete Setup** to save your profile and access the platform."
+    return "You're all set! Review your details and click **Complete Setup** to save your profile."
+
+
+class ExtractProfileRequest(BaseModel):
+    chat_history: List[ChatMessage]
+
+
+class ExtractProfileResponse(BaseModel):
+    first_name: Optional[str]
+    last_name: Optional[str]
+    headline: Optional[str]
+    skills: List[str]
+    hourly_rate: Optional[float]
+    experience_level: Optional[str]
+    bio: Optional[str]
+    portfolio_url: Optional[str]
+    availability: Optional[str]
+    success: bool
+
+
+@router.post("/extract-profile", response_model=ExtractProfileResponse)
+async def extract_profile(request: ExtractProfileRequest):
+    """Parse chat history and extract structured freelancer profile fields."""
+    groq = get_gemini_service()
+
+    history_text = "\n".join(
+        f"{'User' if m.role == 'user' else 'Assistant'}: {m.content}"
+        for m in request.chat_history
+    )
+
+    system_prompt = """
+You are a data extractor. Given a chat conversation about a freelancer's profile, extract the profile details and return ONLY valid JSON with these exact keys:
+{
+  "first_name": "string or null",
+  "last_name": "string or null",
+  "headline": "string or null",
+  "skills": ["skill1", "skill2"],
+  "hourly_rate": number or null,
+  "experience_level": "entry|intermediate|senior|expert or null",
+  "bio": "string or null",
+  "portfolio_url": "string or null",
+  "availability": "full-time|part-time|project-based or null"
+}
+Rules:
+- Extract only what was explicitly mentioned in the conversation
+- skills is a flat array of strings, empty array if none mentioned
+- hourly_rate is a number (no symbols), null if not mentioned
+- Return ONLY the JSON object, no markdown, no explanation
+"""
+    prompt = f"Extract freelancer profile fields from this conversation:\n\n{history_text}"
+
+    raw = await groq.chat(message=prompt, system_prompt=system_prompt)
+
+    import json, re
+    try:
+        match = re.search(r'\{.*\}', raw, re.DOTALL)
+        data = json.loads(match.group()) if match else {}
+    except Exception:
+        data = {}
+
+    return ExtractProfileResponse(
+        first_name=data.get("first_name"),
+        last_name=data.get("last_name"),
+        headline=data.get("headline"),
+        skills=data.get("skills", []),
+        hourly_rate=data.get("hourly_rate"),
+        experience_level=data.get("experience_level"),
+        bio=data.get("bio"),
+        portfolio_url=data.get("portfolio_url"),
+        availability=data.get("availability"),
+        success=True,
     )
 
 
 @router.get("/health")
 async def freelancer_chat_health():
-    """Check if the freelancer chatbot is available"""
-    gemini = get_gemini_service()
+    groq = get_gemini_service()
     return {
         "service": "freelancer_chat",
-        "available": gemini.is_available(),
-        "purpose": "Profile structuring and optimization"
+        "available": groq.is_available(),
+        "purpose": "Profile structuring and optimization",
     }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PlatformWorkflowController;
 use Illuminate\Support\Facades\Route;
@@ -58,4 +59,10 @@ Route::middleware('auth.token')->group(function () {
     Route::get('/tasks', [PlatformWorkflowController::class, 'listTasks']);
     Route::post('/tasks', [PlatformWorkflowController::class, 'createTask']);
     Route::put('/tasks/{taskId}', [PlatformWorkflowController::class, 'updateTask']);
+
+    // Chat history & profile for AI chatbot
+    Route::get('/chat/history', [ChatController::class, 'history']);
+    Route::post('/chat/history', [ChatController::class, 'store']);
+    Route::delete('/chat/history', [ChatController::class, 'clear']);
+    Route::get('/chat/profile', [ChatController::class, 'profile']);
 });

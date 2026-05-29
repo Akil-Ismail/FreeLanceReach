@@ -2,7 +2,9 @@
 Company Chat Router - Strict chatbot for job proposal creation
 """
 
-from fastapi import APIRouter
+import os
+import httpx
+from fastapi import APIRouter, Header
 from pydantic import BaseModel
 from typing import Optional, List
 
@@ -10,11 +12,12 @@ from app.services.gemini_service import get_gemini_service
 
 router = APIRouter()
 
-# Strict system prompt for company chatbot
+LARAVEL_URL = os.getenv("LARAVEL_URL", "http://127.0.0.1:8000/api")
+
 COMPANY_SYSTEM_PROMPT = """
 You are a professional Job Proposal Assistant for companies on a freelancing platform. Your ONLY purpose is to help companies create well-structured job proposals to attract the best freelancers.
 
-STRICT RULES - YOU MUST FOLLOW THESE:
+STRICT RULES:
 1. You can ONLY discuss topics related to creating job proposals
 2. You MUST refuse to help with anything unrelated to job proposal creation
 3. If asked about anything else, politely redirect to job proposal assistance
@@ -25,41 +28,94 @@ YOUR RESPONSIBILITIES:
 - Help define project scope, deliverables, and milestones
 - Advise on budget ranges and payment structures
 - Help write compelling project descriptions
-- Suggest how to make the proposal attractive to quality freelancers
-
-JOB PROPOSAL COMPONENTS YOU HELP WITH:
-1. Job Title - Clear, specific, and searchable
-2. Project Description - Detailed overview of the work needed
-3. Required Skills - Technical and soft skills needed
-4. Scope of Work - Specific tasks and deliverables
-5. Timeline - Expected duration and milestones
-6. Budget - Fair compensation range
-7. Experience Level - Required experience (entry/intermediate/expert)
-8. Application Questions - Questions to screen freelancers
 
 RESPONSE GUIDELINES:
 - Be professional and helpful
 - Provide specific, actionable suggestions
 - Use industry best practices for freelance job postings
-- Help the company attract the right talent
 
 If the user asks about ANYTHING not related to job proposals, respond with:
-"I'm specifically designed to help you create effective job proposals. I'd be happy to assist with crafting your job title, description, requirements, budget, or any other component of your job posting. How can I help you with your job proposal today?"
+"I'm specifically designed to help you create effective job proposals. How can I help you with your job proposal today?"
+"""
+
+COMPANY_PROFILE_SYSTEM_PROMPT = """
+You are a Company Profile Enhancement Specialist for a freelancing platform. Your job is to collect all necessary company profile information by asking questions one at a time, then confirm before updating.
+
+FOLLOW THIS EXACT FLOW — ask ONE question at a time, wait for the answer, then move to the next:
+
+1. Contact person's first name and last name
+2. Company name
+3. Industry (e.g. Technology, Healthcare, Finance)
+4. Company size (e.g. 1-10, 10-50, 50-200, 200+)
+5. Company website URL (or "skip")
+6. Company description (2-4 sentences about mission, values, and what makes you attractive to freelancers)
+
+After collecting ALL 6 answers, summarise everything clearly and ask:
+"Does everything look good? Type 'yes' to update your profile or let me know what to change."
+
+IMPORTANT:
+- Ask only ONE question per message
+- Be professional and give examples for each field
+- Do NOT skip any field
+- Do NOT show a summary until you have all 6 answers
+- When the user confirms, end your message with the exact tag: [PROFILE_READY]
+
+If the user asks about ANYTHING not related to their company profile, respond with:
+"I'm here to help you enhance your company profile. Let's focus on that."
 """
 
 
+def _build_system_prompt(profile: Optional[dict], base: str = COMPANY_SYSTEM_PROMPT) -> str:
+    if not profile:
+        return base
+    lines = [base, "\n---\nCURRENT COMPANY PROFILE (use this for personalised suggestions):"]
+    for k, v in profile.items():
+        if v not in (None, "", [], {}):
+            lines.append(f"- {k.replace('_', ' ').title()}: {v}")
+    return "\n".join(lines)
+
+
+async def _fetch_profile(token: str) -> Optional[dict]:
+    try:
+        async with httpx.AsyncClient(timeout=5) as client:
+            r = await client.get(
+                f"{LARAVEL_URL}/chat/profile",
+                headers={"Authorization": f"Bearer {token}"},
+            )
+            if r.status_code == 200:
+                return r.json().get("profile")
+    except Exception:
+        pass
+    return None
+
+
 class ChatMessage(BaseModel):
-    role: str  # "user" or "assistant"
+    role: str
     content: str
 
 
 class CompanyChatRequest(BaseModel):
     message: str
     chat_history: Optional[List[ChatMessage]] = None
+    mode: Optional[str] = "proposal"  # "proposal" | "profile"
 
 
 class CompanyChatResponse(BaseModel):
     response: str
+    success: bool
+
+
+class ExtractProposalRequest(BaseModel):
+    chat_history: List[ChatMessage]
+
+
+class ExtractProposalResponse(BaseModel):
+    title: str
+    description: str
+    required_skills: List[str]
+    budget_min: Optional[float]
+    budget_max: Optional[float]
+    timeline: Optional[str]
     success: bool
 
 
@@ -73,27 +129,25 @@ class ContractDraftResponse(BaseModel):
 
 
 @router.post("/chat", response_model=CompanyChatResponse)
-async def company_chat(request: CompanyChatRequest):
-    """
-    Company chatbot endpoint for job proposal assistance
-    
-    This chatbot strictly helps companies:
-    - Create job proposal titles
-    - Write project descriptions
-    - Define requirements and skills
-    - Set budgets and timelines
-    - Structure deliverables
-    """
-    gemini = get_gemini_service()
+async def company_chat(
+    request: CompanyChatRequest,
+    authorization: Optional[str] = Header(None),
+):
+    groq = get_gemini_service()
+
+    token = authorization.removeprefix("Bearer ").strip() if authorization else ""
+    profile = await _fetch_profile(token) if token else None
+    base_prompt = COMPANY_PROFILE_SYSTEM_PROMPT if request.mode == "profile" else COMPANY_SYSTEM_PROMPT
+    system_prompt = _build_system_prompt(profile, base_prompt)
 
     history = None
     if request.chat_history:
         history = [{"role": msg.role, "content": msg.content} for msg in request.chat_history]
 
-    if gemini.is_available():
-        response = await gemini.chat(
+    if groq.is_available():
+        response = await groq.chat(
             message=request.message,
-            system_prompt=COMPANY_SYSTEM_PROMPT,
+            system_prompt=system_prompt,
             chat_history=history,
         )
     else:
@@ -103,73 +157,159 @@ async def company_chat(request: CompanyChatRequest):
 
 
 def _company_fallback(message: str, history: list) -> str:
-    """Smart static guide when Gemini is unavailable."""
     turn = len([m for m in history if m.get("role") == "assistant"])
     msg = message.lower()
 
     if turn == 0:
-        return (
-            "Great, let's build your employer profile step by step.\n\n"
-            "**Question 1 of 5:** What is your company name?"
-        )
+        return "Great, let's build your employer profile step by step.\n\n**Question 1 of 5:** What is your company name?"
     if turn == 1:
-        return (
-            f"Got it! \n\n"
-            "**Question 2 of 5:** What industry does your company operate in? "
-            "(e.g., Technology, Healthcare, Finance, E-Commerce)"
-        )
+        return "Got it!\n\n**Question 2 of 5:** What industry does your company operate in?"
     if turn == 2:
-        return (
-            "Perfect. \n\n"
-            "**Question 3 of 5:** What is your name as the primary hiring contact? "
-            "(First and last name)"
-        )
+        return "Perfect.\n\n**Question 3 of 5:** What is your name as the primary hiring contact?"
     if turn == 3:
-        return (
-            "Thanks! \n\n"
-            "**Question 4 of 5:** In 2–3 sentences, describe your company — "
-            "what you do, your mission, and what makes working with you attractive to freelancers."
-        )
+        return "Thanks!\n\n**Question 4 of 5:** Describe your company in 2–3 sentences."
     if turn == 4:
-        return (
-            "Almost there! \n\n"
-            "**Question 5 of 5:** What types of freelancers do you typically hire, "
-            "and what skills are most important to you?"
-        )
+        return "Almost there!\n\n**Question 5 of 5:** What types of freelancers do you typically hire?"
 
     keywords = ["react", "python", "design", "developer", "engineer", "marketing", "finance", "mobile"]
     detected = [k for k in keywords if k in msg]
     if detected:
-        return (
-            f"That's useful context — hiring for **{', '.join(detected)}** roles. "
-            "Use your answers to fill in the profile form on the right, then click **Complete Setup** to continue."
-        )
+        return f"That's useful context — hiring for **{', '.join(detected)}** roles. Fill in the form on the right."
 
-    return (
-        "You're almost ready! Review your answers in the form on the right and click "
-        "**Complete Setup** to save your employer profile and access the platform."
+    return "You're almost ready! Review your answers and click **Complete Setup** to save your employer profile."
+
+
+@router.post("/extract-proposal", response_model=ExtractProposalResponse)
+async def extract_proposal(request: ExtractProposalRequest):
+    """
+    Parse the chat history and extract a structured job proposal ready to post.
+    """
+    groq = get_gemini_service()
+
+    history_text = "\n".join(
+        f"{'User' if m.role == 'user' else 'Assistant'}: {m.content}"
+        for m in request.chat_history
+    )
+
+    system_prompt = """
+You are a data extractor. Given a chat conversation about a job proposal, extract the proposal details and return ONLY valid JSON with these exact keys:
+{
+  "title": "string",
+  "description": "string (2-4 sentences summarising the job)",
+  "required_skills": ["skill1", "skill2"],
+  "budget_min": number or null,
+  "budget_max": number or null,
+  "timeline": "string or null"
+}
+Rules:
+- title must be concise (5-10 words)
+- description should be a clear job overview
+- required_skills is a flat array of strings
+- budget values are numbers in USD (no symbols), null if not mentioned
+- timeline is a plain string like "2 weeks" or "1 month", null if not mentioned
+- Return ONLY the JSON object, no markdown, no explanation
+"""
+    prompt = f"Extract a structured job proposal from this conversation:\n\n{history_text}"
+
+    raw = await groq.chat(message=prompt, system_prompt=system_prompt)
+
+    import json, re
+    try:
+        match = re.search(r'\{.*\}', raw, re.DOTALL)
+        data = json.loads(match.group()) if match else {}
+    except Exception:
+        data = {}
+
+    return ExtractProposalResponse(
+        title=data.get("title", ""),
+        description=data.get("description", ""),
+        required_skills=data.get("required_skills", []),
+        budget_min=data.get("budget_min"),
+        budget_max=data.get("budget_max"),
+        timeline=data.get("timeline"),
+        success=bool(data.get("title")),
+    )
+
+
+class ExtractCompanyProfileRequest(BaseModel):
+    chat_history: List[ChatMessage]
+
+
+class ExtractCompanyProfileResponse(BaseModel):
+    contact_first_name: Optional[str]
+    contact_last_name: Optional[str]
+    company_name: Optional[str]
+    company_description: Optional[str]
+    industry: Optional[str]
+    company_size: Optional[str]
+    company_website: Optional[str]
+    success: bool
+
+
+@router.post("/extract-profile", response_model=ExtractCompanyProfileResponse)
+async def extract_company_profile(request: ExtractCompanyProfileRequest):
+    """Parse chat history and extract structured company profile fields."""
+    groq = get_gemini_service()
+
+    history_text = "\n".join(
+        f"{'User' if m.role == 'user' else 'Assistant'}: {m.content}"
+        for m in request.chat_history
+    )
+
+    system_prompt = """
+You are a data extractor. Given a chat conversation about a company's profile, extract the profile details and return ONLY valid JSON with these exact keys:
+{
+  "contact_first_name": "string or null",
+  "contact_last_name": "string or null",
+  "company_name": "string or null",
+  "company_description": "string or null",
+  "industry": "string or null",
+  "company_size": "string or null",
+  "company_website": "string or null"
+}
+Rules:
+- Extract only what was explicitly mentioned
+- Return ONLY the JSON object, no markdown, no explanation
+"""
+    prompt = f"Extract company profile fields from this conversation:\n\n{history_text}"
+
+    raw = await groq.chat(message=prompt, system_prompt=system_prompt)
+
+    import json, re
+    try:
+        match = re.search(r'\{.*\}', raw, re.DOTALL)
+        data = json.loads(match.group()) if match else {}
+    except Exception:
+        data = {}
+
+    return ExtractCompanyProfileResponse(
+        contact_first_name=data.get("contact_first_name"),
+        contact_last_name=data.get("contact_last_name"),
+        company_name=data.get("company_name"),
+        company_description=data.get("company_description"),
+        industry=data.get("industry"),
+        company_size=data.get("company_size"),
+        company_website=data.get("company_website"),
+        success=True,
     )
 
 
 @router.get("/health")
 async def company_chat_health():
-    """Check if the company chatbot is available"""
-    gemini = get_gemini_service()
+    groq = get_gemini_service()
     return {
         "service": "company_chat",
-        "available": gemini.is_available(),
-        "purpose": "Job proposal creation assistance"
+        "available": groq.is_available(),
+        "purpose": "Job proposal creation assistance",
     }
 
 
 @router.post("/contract-draft", response_model=ContractDraftResponse)
 async def company_contract_draft(request: ContractDraftRequest):
-    """Generate a contract draft from employer-provided details."""
-    gemini = get_gemini_service()
-
+    groq = get_gemini_service()
     details_text = "\n".join([f"- {k}: {v}" for k, v in request.details.items()])
 
-    if gemini.is_available():
+    if groq.is_available():
         system_prompt = """
 You are a Contract Drafting Assistant for freelance engagements.
 Generate a clear, professional service agreement using provided details.
@@ -177,7 +317,7 @@ Always include: scope, payment terms, milestones/timeline, confidentiality, IP o
 Keep language practical and business-friendly.
 """
         prompt = f"Create a freelance contract draft with these details:\n{details_text}"
-        contract_text = await gemini.chat(prompt, system_prompt=system_prompt)
+        contract_text = await groq.chat(prompt, system_prompt=system_prompt)
     else:
         scope = request.details.get("scope", "Detailed services as agreed by both parties.")
         payment = request.details.get("payment_terms", "Compensation as mutually agreed.")
