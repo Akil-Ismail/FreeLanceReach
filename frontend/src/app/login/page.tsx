@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/landing/Header";
 import api from "@/lib/api";
+import { useGoogleLogin } from "@react-oauth/google";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -14,6 +15,77 @@ export default function LoginPage() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [rolePicker, setRolePicker] = useState<{ token: string; user: Record<string, unknown> } | null>(null);
+
+  const storeAuthAndRedirect = (token: string, user: Record<string, unknown>, isGoogle = false) => {
+    localStorage.setItem("authToken", token);
+    if (isGoogle) localStorage.setItem("googleAuth", "true");
+    const role = (user.role as string) || "freelancer";
+    const email = (user.email as string) || "";
+    const id = user.id as number;
+    localStorage.setItem("userRole", role);
+    localStorage.setItem("userEmail", email);
+    if (id) {
+      localStorage.setItem("userId", String(id));
+      localStorage.setItem(`user:profile:${id}`, JSON.stringify({ value: user, savedAt: Date.now() }));
+    }
+    const setupComplete = id
+      ? localStorage.getItem(`profileSetupComplete:${id}`) === "true"
+      : false;
+    router.push(setupComplete ? (role === "company" ? "/home/employer" : "/home/freelancer") : "/home/setup");
+  };
+
+  const handleGoogleRole = async (role: "freelancer" | "company") => {
+    if (!rolePicker) return;
+    setIsLoading(true);
+    setRolePicker(null);
+    try {
+      const res = await api.post("/auth/google/set-role", {
+        user_id: rolePicker.user.id,
+        role,
+      });
+      storeAuthAndRedirect(rolePicker.token, { ...rolePicker.user, role: res.data.user?.role || role }, true);
+    } catch {
+      storeAuthAndRedirect(rolePicker.token, { ...rolePicker.user, role }, true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setIsLoading(true);
+      setError("");
+      try {
+        const userInfoRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        });
+        const userInfo = await userInfoRes.json();
+
+        const res = await api.post("/auth/google", {
+          credential: tokenResponse.access_token,
+          email: userInfo.email,
+          first_name: userInfo.given_name,
+          last_name: userInfo.family_name,
+        });
+
+        // Existing user — go straight in
+        if (!res.data.is_new_user) {
+          storeAuthAndRedirect(res.data.token, res.data.user, false);
+          return;
+        }
+
+        // New user — ask role before proceeding
+        setRolePicker({ token: res.data.token, user: res.data.user });
+      } catch (err) {
+        const e = err as { response?: { data?: { message?: string; detail?: string } }; message?: string };
+        setError(e.response?.data?.message || e.response?.data?.detail || e.message || "Google sign-in failed. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    onError: () => setError("Google sign-in was cancelled or failed."),
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -218,7 +290,7 @@ export default function LoginPage() {
 
             {/* Social Login */}
             <div className="grid grid-cols-2 gap-3">
-              <button className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+              <button type="button" onClick={() => googleLogin()} disabled={isLoading} className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50">
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
                     fill="currentColor"
@@ -241,7 +313,7 @@ export default function LoginPage() {
                   Google
                 </span>
               </button>
-              <button className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+              <button type="button" onClick={() => setError("GitHub sign-in is not available yet.")} className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                 <svg
                   className="w-5 h-5"
                   fill="currentColor"
@@ -277,6 +349,36 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+
+      {/* Role picker modal for new Google users */}
+      {rolePicker && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm mx-4">
+            <h2 className="text-xl font-bold text-gray-900 text-center mb-1">One last step</h2>
+            <p className="text-sm text-gray-400 text-center mb-6">How will you be using FreelanceReach?</p>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                className="flex flex-col items-center justify-center gap-2 py-5 px-3 rounded-xl border-2 border-gray-200 hover:border-red-500 hover:bg-red-50 transition-all group disabled:opacity-50"
+                onClick={() => handleGoogleRole("freelancer")}
+                disabled={isLoading}
+              >
+                <span className="text-2xl">💼</span>
+                <span className="text-sm font-semibold text-gray-800 group-hover:text-red-600">Freelancer</span>
+                <span className="text-xs text-gray-400 text-center">Find work &amp; clients</span>
+              </button>
+              <button
+                className="flex flex-col items-center justify-center gap-2 py-5 px-3 rounded-xl border-2 border-gray-200 hover:border-red-500 hover:bg-red-50 transition-all group disabled:opacity-50"
+                onClick={() => handleGoogleRole("company")}
+                disabled={isLoading}
+              >
+                <span className="text-2xl">🏢</span>
+                <span className="text-sm font-semibold text-gray-800 group-hover:text-red-600">Company</span>
+                <span className="text-xs text-gray-400 text-center">Hire freelancers</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

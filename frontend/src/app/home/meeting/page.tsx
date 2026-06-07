@@ -24,9 +24,11 @@ type Match = {
   id: number;
   proposal_id: number;
   freelancer_user_id: number;
+  company_user_id?: number;
   status: string;
   freelancer?: { first_name?: string; last_name?: string; email?: string };
-  proposal?: { title?: string };
+  company?: { company_name?: string; contact_first_name?: string };
+  proposal?: { title?: string; company_user_id?: number };
 };
 
 const STATUS_STYLE: Record<string, string> = {
@@ -39,6 +41,7 @@ const STATUS_STYLE: Record<string, string> = {
 const EMPTY_FORM = {
   proposal_match_id: "",
   freelancer_user_id: "",
+  company_user_id: "",
   proposed_at: "",
   notes: "",
 };
@@ -57,6 +60,8 @@ export default function HomeMeetingPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [respondingId, setRespondingId] = useState<number | null>(null);
+  const [editTarget, setEditTarget] = useState<Meeting | null>(null);
+  const [editForm, setEditForm] = useState({ proposed_at: "", notes: "" });
   const [form, setForm] = useState(EMPTY_FORM);
   const [toast, setToast] = useState<{
     type: "success" | "error";
@@ -81,14 +86,14 @@ export default function HomeMeetingPage() {
   }, [userId]);
 
   const loadMutualMatches = useCallback(async () => {
-    if (!userId || role !== "company") return;
+    if (!userId) return;
     const res = await api.get("/matches", {
       params: { actor_user_id: userId },
     });
     setMutualMatches(
       (res.data || []).filter((m: Match) => m.status === "mutual_approved"),
     );
-  }, [userId, role]);
+  }, [userId]);
 
   useEffect(() => {
     loadMeetings();
@@ -105,8 +110,8 @@ export default function HomeMeetingPage() {
       await api.post("/meetings", {
         actor_user_id: userId,
         proposal_match_id: Number(form.proposal_match_id),
-        company_user_id: userId,
-        freelancer_user_id: Number(form.freelancer_user_id),
+        company_user_id: role === "company" ? userId : Number(form.company_user_id),
+        freelancer_user_id: role === "freelancer" ? userId : Number(form.freelancer_user_id),
         proposed_at: form.proposed_at,
         notes: form.notes || undefined,
       });
@@ -157,6 +162,11 @@ export default function HomeMeetingPage() {
   };
 
   const matchLabel = (m: Match) => {
+    if (role === "freelancer") {
+      const c = m.company;
+      const name = c?.company_name || c?.contact_first_name || `Company`;
+      return `${m.proposal?.title || `Proposal #${m.proposal_id}`} — ${name}`;
+    }
     const f = m.freelancer;
     const name = f
       ? `${f.first_name || ""} ${f.last_name || ""}`.trim() || f.email
@@ -193,6 +203,46 @@ export default function HomeMeetingPage() {
     });
   };
 
+  const openEdit = (meeting: Meeting) => {
+    setEditTarget(meeting);
+    const dt = meeting.proposed_at ? new Date(meeting.proposed_at) : null;
+    const local = dt
+      ? new Date(dt.getTime() - dt.getTimezoneOffset() * 60000).toISOString().slice(0, 16)
+      : "";
+    setEditForm({ proposed_at: local, notes: meeting.notes || "" });
+  };
+
+  const submitEdit = async () => {
+    if (!editTarget) return;
+    setSubmitting(true);
+    try {
+      await api.post(`/meetings/${editTarget.id}/respond`, {
+        actor_user_id: userId,
+        action: "edit",
+        new_time: editForm.proposed_at || undefined,
+        notes: editForm.notes || undefined,
+      });
+      showToast("success", "Meeting updated — freelancer has been notified.");
+      setEditTarget(null);
+      await loadMeetings();
+    } catch (err) {
+      const e = err as { response?: { data?: { message?: string } }; message?: string };
+      showToast("error", e.response?.data?.message || e.message || "Update failed.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const canJoinMeeting = (meeting: Meeting): { allowed: boolean; label: string } => {
+    const meetingTime = meeting.proposed_at ? new Date(meeting.proposed_at).getTime() : null;
+    if (!meetingTime) return { allowed: false, label: "Join Meeting" };
+    const now = Date.now();
+    const minsUntil = Math.round((meetingTime - now) / 60000);
+    if (minsUntil > 10) return { allowed: false, label: "Not accessible yet" };
+    if (minsUntil < -120) return { allowed: false, label: "Meeting ended" };
+    return { allowed: true, label: "Join Meeting" };
+  };
+
   return (
     <>
       <SectionShell
@@ -226,9 +276,7 @@ export default function HomeMeetingPage() {
                 <CalendarDays className="w-6 h-6 text-gray-400" />
               </div>
               <p className="text-sm text-gray-500">
-                {role === "company"
-                  ? "No meetings yet. Use the + button to schedule one after a match is approved."
-                  : "No meetings yet. They will appear here when a company invites you."}
+                {"No meetings yet. Use the + button to schedule one once a match is mutually approved."}
               </p>
             </div>
           ) : (
@@ -270,34 +318,66 @@ export default function HomeMeetingPage() {
                       )}
                     </div>
 
-                    {meeting.google_meet_link && (
-                      <a
-                        href={meeting.google_meet_link}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="btn text-sm shrink-0 flex items-center gap-2"
-                      >
-                        <Video className="w-4 h-4" /> Join Meeting
-                      </a>
-                    )}
+                    {meeting.google_meet_link && (() => {
+                      const { allowed, label } = canJoinMeeting(meeting);
+                      return allowed ? (
+                        <a
+                          href={meeting.google_meet_link}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="btn text-sm shrink-0 flex items-center gap-2"
+                        >
+                          <Video className="w-4 h-4" /> {label}
+                        </a>
+                      ) : (
+                        <button
+                          disabled
+                          className="btn text-sm shrink-0 flex items-center gap-2 opacity-50 cursor-not-allowed"
+                          title={label}
+                        >
+                          <Video className="w-4 h-4" /> {label}
+                        </button>
+                      );
+                    })()}
                   </div>
 
-                  {canRespond(meeting) && (
+                  {(canRespond(meeting) || meeting.status === "approved") && (
                     <div className="flex gap-2 pt-3 border-t border-gray-100 mt-2">
-                      <button
-                        className="btn text-sm flex-1"
-                        disabled={respondingId === meeting.id}
-                        onClick={() => respond(meeting.id, "approve")}
-                      >
-                        {respondingId === meeting.id ? "..." : "Approve"}
-                      </button>
-                      <button
-                        className="btn-secondary text-sm"
-                        disabled={respondingId === meeting.id}
-                        onClick={() => respond(meeting.id, "reject")}
-                      >
-                        Reject
-                      </button>
+                      {canRespond(meeting) && (
+                        <button
+                          className="btn text-sm flex-1"
+                          disabled={respondingId === meeting.id}
+                          onClick={() => respond(meeting.id, "approve")}
+                        >
+                          {respondingId === meeting.id ? "..." : "Approve"}
+                        </button>
+                      )}
+                      {role === "company" && meeting.status === "approved" && (
+                        <button
+                          className="btn text-sm flex-1"
+                          onClick={() => openEdit(meeting)}
+                        >
+                          Edit Meeting
+                        </button>
+                      )}
+                      {role === "freelancer" && meeting.status === "approved" && (
+                        <button
+                          className="btn-secondary text-sm"
+                          disabled={respondingId === meeting.id}
+                          onClick={() => respond(meeting.id, "reject")}
+                        >
+                          {respondingId === meeting.id ? "..." : "Cancel Attendance"}
+                        </button>
+                      )}
+                      {canRespond(meeting) && (
+                        <button
+                          className="btn-secondary text-sm"
+                          disabled={respondingId === meeting.id}
+                          onClick={() => respond(meeting.id, "reject")}
+                        >
+                          Reject
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
@@ -307,8 +387,8 @@ export default function HomeMeetingPage() {
         </div>
       </SectionShell>
 
-      {/* Floating + (company only) */}
-      {role === "company" && (
+      {/* Floating + */}
+      {(role === "company" || role === "freelancer") && (
         <button
           onClick={() => setModalOpen(true)}
           className="fixed bottom-8 right-8 z-40 w-14 h-14 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-lg hover:shadow-xl flex items-center justify-center transition-all duration-200 active:scale-95"
@@ -348,8 +428,9 @@ export default function HomeMeetingPage() {
                   setForm({
                     ...form,
                     proposal_match_id: matchId,
-                    freelancer_user_id: match
-                      ? String(match.freelancer_user_id)
+                    freelancer_user_id: match ? String(match.freelancer_user_id) : "",
+                    company_user_id: match
+                      ? String(match.proposal?.company_user_id ?? "")
                       : "",
                   });
                 }}
@@ -409,6 +490,45 @@ export default function HomeMeetingPage() {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* Edit meeting modal (company) */}
+      <Modal
+        isOpen={!!editTarget}
+        onClose={() => setEditTarget(null)}
+        title="Edit Meeting"
+      >
+        <div className="space-y-4">
+          <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
+            Editing will reset the meeting to <strong>pending</strong> and notify the freelancer to re-confirm.
+          </p>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">New Date & Time</label>
+            <input
+              className="input"
+              type="datetime-local"
+              value={editForm.proposed_at}
+              onChange={(e) => setEditForm({ ...editForm, proposed_at: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Notes</label>
+            <input
+              className="input"
+              placeholder="Update meeting notes..."
+              value={editForm.notes}
+              onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
+            />
+          </div>
+          <div className="flex gap-3 pt-1">
+            <button className="btn flex-1 text-sm" onClick={submitEdit} disabled={submitting}>
+              {submitting ? "Saving..." : "Save & Notify"}
+            </button>
+            <button className="btn-secondary flex-1 text-sm" onClick={() => setEditTarget(null)}>
+              Cancel
+            </button>
+          </div>
+        </div>
       </Modal>
     </>
   );

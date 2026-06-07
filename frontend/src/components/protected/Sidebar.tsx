@@ -6,6 +6,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import logo from "../../../public/logo1.png";
 import { UserRole } from "@/hooks/useAuth";
+import { NotificationCounts } from "@/hooks/useNotificationCounts";
 import {
   Home,
   User,
@@ -25,6 +26,8 @@ import {
 interface SidebarProps {
   role: UserRole;
   onLogout: () => void;
+  counts?: NotificationCounts;
+  markSeen?: (section: keyof NotificationCounts | "all") => void;
 }
 
 type NavItem = {
@@ -45,15 +48,32 @@ const COMMON_ITEMS: NavItem[] = [
   { name: "Tasks", href: "/home/tasks", icon: ListChecks },
 ];
 
-export const Sidebar = ({ role, onLogout }: SidebarProps) => {
+const BADGE_KEYS: Record<string, keyof NotificationCounts> = {
+  "/home/approvals": "approvals",
+  "/home/meeting": "meetings",
+  "/home/notifications": "notifications",
+};
+
+const SECTION_MAP: Record<string, keyof NotificationCounts | "all"> = {
+  "/home/approvals": "approvals",
+  "/home/meeting": "meetings",
+  "/home/notifications": "all",
+};
+
+export const Sidebar = ({ role, onLogout, counts, markSeen }: SidebarProps) => {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const homePath = role === "company" ? "/home/employer" : "/home/freelancer";
 
   const navItems = useMemo<NavItem[]>(() => {
-    return [{ name: "Home", href: homePath, icon: Home }, ...COMMON_ITEMS];
-  }, [homePath]);
+    const items = COMMON_ITEMS.map((item) =>
+      item.href === "/home/proposal" && role === "freelancer"
+        ? { ...item, name: "Jobs" }
+        : item
+    );
+    return [{ name: "Home", href: homePath, icon: Home }, ...items];
+  }, [homePath, role]);
 
   const NavContent = ({ closeOnClick = false }: { closeOnClick?: boolean }) => (
     <>
@@ -80,7 +100,11 @@ export const Sidebar = ({ role, onLogout }: SidebarProps) => {
             <Link
               key={item.href}
               href={item.href}
-              onClick={() => closeOnClick && setMobileOpen(false)}
+              onClick={() => {
+                closeOnClick && setMobileOpen(false);
+                const section = SECTION_MAP[item.href];
+                if (section && markSeen) markSeen(section);
+              }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                 isActive
                   ? "bg-red-600 text-white shadow-sm"
@@ -88,7 +112,16 @@ export const Sidebar = ({ role, onLogout }: SidebarProps) => {
               }`}
             >
               <Icon className="w-5 h-5" />
-              <span className="text-sm font-semibold">{item.name}</span>
+              <span className="text-sm font-semibold flex-1">{item.name}</span>
+              {(() => {
+                const key = BADGE_KEYS[item.href];
+                const n = key && counts ? counts[key] : 0;
+                return n > 0 ? (
+                  <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center ${isActive ? "bg-white text-red-600" : "bg-red-600 text-white"}`}>
+                    {n > 99 ? "99+" : n}
+                  </span>
+                ) : null;
+              })()}
             </Link>
           );
         })}

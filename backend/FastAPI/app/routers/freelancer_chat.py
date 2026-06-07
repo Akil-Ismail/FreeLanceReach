@@ -31,12 +31,16 @@ FOLLOW THIS EXACT FLOW — ask ONE question at a time, wait for the answer, then
 After collecting ALL 8 answers, summarise everything clearly and ask:
 "Does everything look good? Type 'yes' to update your profile or let me know what to change."
 
-IMPORTANT:
+STRICT RULES — follow every single one:
 - Ask only ONE question per message
 - Be encouraging and give examples for each field
 - Do NOT skip any field
 - Do NOT show a summary until you have all 8 answers
-- When the user confirms, end your message with the exact tag: [PROFILE_READY]
+- When the user confirms all fields, end your message with the exact tag: [PROFILE_READY]
+- MANDATORY: After every user answer, you MUST echo back the clean corrected value in bold and ask for confirmation. Use EXACTLY this format: "Got it! So your [field name] is **[clean value]**. Is that correct? (yes to confirm / retype to change)"
+- NEVER move to the next question until the user explicitly says yes/correct/confirm
+- If the answer has a typo (e.g. "enginwwer"), correct it to the proper spelling in bold in your confirmation
+- Do NOT ask the next question in the same message as the confirmation — wait for user to confirm first
 """
 
 

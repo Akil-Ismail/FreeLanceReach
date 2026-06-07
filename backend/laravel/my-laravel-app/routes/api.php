@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Route;
 
 // Public: authentication and registration (no token required)
 Route::post('/login', [UserController::class, 'login']);
+Route::post('/auth/google', [UserController::class, 'googleAuth']);
+Route::post('/auth/google/set-role', [UserController::class, 'googleSetRole']);
 Route::post('/register/company', [UserController::class, 'registerCompany']);
 Route::post('/register/freelancer', [UserController::class, 'registerFreelancer']);
 
@@ -37,6 +39,7 @@ Route::middleware('auth.token')->group(function () {
     Route::get('/proposals', [PlatformWorkflowController::class, 'listProposals']);
     Route::post('/proposals', [PlatformWorkflowController::class, 'createProposal']);
     Route::post('/proposals/{proposalId}/match', [PlatformWorkflowController::class, 'runMatches']);
+    Route::post('/proposals/{proposalId}/apply', [PlatformWorkflowController::class, 'applyToProposal']);
 
     // Matches
     Route::get('/matches', [PlatformWorkflowController::class, 'listMatches']);

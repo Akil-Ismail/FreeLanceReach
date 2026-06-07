@@ -49,7 +49,13 @@ export default function HomeApprovalsPage() {
 
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
-  const [toast] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [undoingId, setUndoingId] = useState<number | null>(null);
+  const [toast, setToast] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const showToast = (type: "success" | "error", text: string) => {
+    setToast({ type, text });
+    setTimeout(() => setToast(null), 4000);
+  };
 
   const load = async () => {
     if (!userId) return;
@@ -64,11 +70,30 @@ export default function HomeApprovalsPage() {
     }
   };
 
+  const removeRejection = async (matchId: number) => {
+    setUndoingId(matchId);
+    try {
+      await api.post(`/matches/${matchId}/respond`, {
+        actor_user_id: userId,
+        approve: false,
+        remove_approval: true,
+      });
+      showToast("success", "Rejection removed — match reset to pending.");
+      await load();
+    } catch (err) {
+      const e = err as { response?: { data?: { message?: string } }; message?: string };
+      showToast("error", e.response?.data?.message || e.message || "Could not remove rejection.");
+    } finally {
+      setUndoingId(null);
+    }
+  };
+
   useEffect(() => {
     load();
   }, []);
 
   const approved = matches.filter((m) => m.status !== "rejected" && m.status !== "pending");
+  const rejected = matches.filter((m) => m.status === "rejected");
 
   const freelancerName = (m: Match) => {
     const f = m.freelancer;
@@ -79,9 +104,6 @@ export default function HomeApprovalsPage() {
       `#${m.freelancer_user_id}`
     );
   };
-
-  const scorePercent = (score?: number) =>
-    score != null ? Math.round(Number(score) * 100) : null;
 
   return (
     <SectionShell
@@ -123,7 +145,6 @@ export default function HomeApprovalsPage() {
                 Approved ({approved.length})
               </h2>
               {approved.map((match) => {
-                const pct = scorePercent(match.match_score);
                 const meta = STATUS_META[match.status] || {
                   label: match.status,
                   style: "bg-gray-100 text-gray-600",
@@ -145,14 +166,51 @@ export default function HomeApprovalsPage() {
                       )}
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
-                      {pct != null && (
-                        <span className="text-xs text-gray-400">{pct}%</span>
-                      )}
                       <span
                         className={`text-xs font-medium px-2 py-0.5 rounded-full ${meta.style}`}
                       >
                         {meta.label}
                       </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {rejected.length > 0 && (
+            <div className="space-y-3">
+              <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+                Rejected ({rejected.length})
+              </h2>
+              {rejected.map((match) => {
+                return (
+                  <div
+                    key={match.id}
+                    className="bg-white border border-gray-100 rounded-2xl p-4 flex items-center justify-between gap-4 opacity-60"
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-gray-800">
+                        {match.proposal?.title ||
+                          `Proposal #${match.proposal_id}`}
+                      </p>
+                      {role === "company" && (
+                        <p className="text-xs text-gray-500">
+                          {freelancerName(match)}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-red-50 text-red-600">
+                        Rejected
+                      </span>
+                      <button
+                        className="text-xs px-3 py-1 rounded-lg border border-gray-200 text-gray-600 hover:border-gray-400 hover:text-gray-800 transition disabled:opacity-40"
+                        disabled={undoingId === match.id}
+                        onClick={() => removeRejection(match.id)}
+                      >
+                        {undoingId === match.id ? "..." : "Remove Rejection"}
+                      </button>
                     </div>
                   </div>
                 );

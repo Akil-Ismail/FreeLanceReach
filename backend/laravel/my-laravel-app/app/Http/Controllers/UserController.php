@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -44,6 +45,80 @@ class UserController extends Controller
             'token' => $plainToken,
             'user' => $user,
         ]);
+    }
+
+    // Google OAuth login / register
+    public function googleAuth(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'credential'  => 'required|string',
+            'email'       => 'required|email',
+            'first_name'  => 'nullable|string',
+            'last_name'   => 'nullable|string',
+            'role'        => 'nullable|in:freelancer,company',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
+        }
+
+        // Verify access token with Google userinfo endpoint
+        $accessToken = $request->input('credential');
+        $googleResponse = Http::withoutVerifying()->withToken($accessToken)
+            ->get('https://www.googleapis.com/oauth2/v3/userinfo');
+
+        if (!$googleResponse->successful() || empty($googleResponse->json('email'))) {
+            return response()->json([
+                'message' => 'Invalid Google token',
+                'detail'  => $googleResponse->body(),
+            ], 401);
+        }
+
+        $email     = $request->input('email');
+        $firstName = $request->input('first_name', '');
+        $lastName  = $request->input('last_name', '');
+
+        // Find or create user
+        $isNew = false;
+        $user  = User::where('email', $email)->first();
+        if (!$user) {
+            $isNew = true;
+            $user  = User::create([
+                'email'        => $email,
+                'first_name'   => $firstName,
+                'last_name'    => $lastName,
+                'role'         => 'freelancer', // temporary; will be updated by set-role
+                'phone_number' => '',
+                'password'     => bcrypt(Str::random(32)),
+            ]);
+        }
+
+        $plainToken      = Str::random(60);
+        $user->api_token = hash('sha256', $plainToken);
+        $user->save();
+
+        return response()->json([
+            'message'      => 'Google authentication successful',
+            'token'        => $plainToken,
+            'user'         => $user,
+            'is_new_user'  => $isNew,
+        ]);
+    }
+
+    // Set role for a new Google user
+    public function googleSetRole(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+            'role'    => 'required|in:freelancer,company',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
+        }
+        $user = User::findOrFail($request->user_id);
+        $user->role = $request->role;
+        $user->save();
+        return response()->json(['message' => 'Role updated', 'user' => $user]);
     }
 
     // Get all users
@@ -96,9 +171,14 @@ class UserController extends Controller
 
         $user = User::create($data);
 
+        $plainToken = Str::random(60);
+        $user->api_token = hash('sha256', $plainToken);
+        $user->save();
+
         return response()->json([
             'message' => 'Company registered successfully',
-            'user' => $user
+            'token' => $plainToken,
+            'user' => $user,
         ], 201);
     }
 

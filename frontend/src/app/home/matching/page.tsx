@@ -22,7 +22,16 @@ type Match = {
   match_score: number;
   status: string;
   model_source: string;
-  proposal?: { title?: string; status?: string };
+  proposal?: {
+    title?: string;
+    status?: string;
+    description?: string;
+    required_skills?: string[] | null;
+    budget_min?: number | null;
+    budget_max?: number | null;
+    timeline?: string | null;
+    company?: { company_name?: string; contact_first_name?: string; contact_last_name?: string; industry?: string };
+  };
   freelancer?: {
     first_name?: string;
     last_name?: string;
@@ -112,8 +121,14 @@ export default function HomeMatchingPage() {
   }, [userId, role]);
 
   useEffect(() => {
-    loadMatches();
-  }, [loadMatches]);
+    if (role === "company") {
+      rerunAndRefresh();
+    } else {
+      loadMatches();
+    }
+    const interval = setInterval(() => loadMatches(true), 30_000);
+    return () => clearInterval(interval);
+  }, [loadMatches, rerunAndRefresh, role]);
 
   const respond = async (matchId: number, approve: boolean) => {
     setRespondingId(matchId);
@@ -190,9 +205,10 @@ export default function HomeMatchingPage() {
     );
   };
 
-  // Filter: above 20%, exclude rejected, apply search query
+  const declined = matches.filter((m) => m.status === "rejected");
+
   const visible = matches
-    .filter((m) => Math.round(Number(m.match_score) * 100) > 20)
+    .filter((m) => Math.round(Number(m.match_score) * 100) > 10)
     .filter((m) => m.status !== "rejected")
     .filter((m) => {
       if (!query.trim()) return true;
@@ -249,7 +265,7 @@ export default function HomeMatchingPage() {
             <RefreshCw
               className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`}
             />
-            Refresh
+            {refreshing ? "Running…" : "Re-run AI"}
           </button>
         </div>
       }
@@ -274,121 +290,184 @@ export default function HomeMatchingPage() {
               : "No matches yet. They appear here once a company posts a proposal."}
           </p>
         </div>
+      ) : role === "freelancer" ? (
+        /* ── Freelancer: job cards matching Jobs page style ── */
+        <div className="space-y-3">
+          {visible.map((match) => {
+            const p = match.proposal;
+            const actionable = needsAction(match);
+            const busy = respondingId === match.id;
+            const companyName = p?.company?.company_name?.trim() ||
+              [p?.company?.contact_first_name, p?.company?.contact_last_name].filter(Boolean).join(" ") || "";
+            return (
+              <div key={match.id} className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:border-gray-300 transition">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                      <h3 className="text-sm font-semibold text-gray-900 truncate">
+                        {p?.title || `Job #${match.proposal_id}`}
+                      </h3>
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full capitalize shrink-0 ${STATUS_STYLE[match.status] || "bg-gray-100 text-gray-500"}`}>
+                        {match.status.replace(/_/g, " ")}
+                      </span>
+                    </div>
+                    {companyName && (
+                      <p className="text-xs text-gray-400 mb-1">
+                        {companyName}{p?.company?.industry ? ` · ${p.company.industry}` : ""}
+                      </p>
+                    )}
+                    {p?.description && (
+                      <p className="text-sm text-gray-600 line-clamp-2">{p.description}</p>
+                    )}
+                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400">
+                      {(p?.budget_min != null || p?.budget_max != null) && (
+                        <span>Budget: ${p?.budget_min ?? "?"} – ${p?.budget_max ?? "?"}</span>
+                      )}
+                      {p?.timeline && <span>Timeline: {p.timeline}</span>}
+                    </div>
+                    {(p?.required_skills?.length ?? 0) > 0 && (
+                      <div className="mt-2.5 flex flex-wrap gap-1.5">
+                        {p!.required_skills!.map((skill) => (
+                          <span key={skill} className="text-xs px-2 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-100">
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {actionable && (
+                  <div className="flex gap-2 mt-4">
+                    <button className="btn flex-1 flex items-center justify-center gap-2 text-sm" disabled={busy} onClick={() => respond(match.id, true)}>
+                      {busy ? <span className="w-3 h-3 border-2 border-white/50 border-t-white rounded-full animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                      Accept
+                    </button>
+                    <button className="btn-secondary flex items-center justify-center gap-2 text-sm px-4" disabled={busy} onClick={() => respond(match.id, false)}>
+                      <XCircle className="w-4 h-4 text-red-500" /> Decline
+                    </button>
+                  </div>
+                )}
+                {canRemoveApproval(match) && !actionable && (
+                  <div className="mt-3">
+                    <button className="btn-secondary flex items-center gap-2 text-sm px-4" disabled={busy} onClick={() => removeApproval(match.id)}>
+                      <XCircle className="w-4 h-4 text-gray-500" /> Remove Approval
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          {/* ── Declined offers ── */}
+          {declined.length > 0 && (
+            <div className="mt-6">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Declined Offers</p>
+              <div className="space-y-2">
+                {declined.map((match) => {
+                  const p = match.proposal;
+                  const busy = respondingId === match.id;
+                  const companyName = p?.company?.company_name?.trim() ||
+                    [p?.company?.contact_first_name, p?.company?.contact_last_name].filter(Boolean).join(" ") || "";
+                  return (
+                    <div key={match.id} className="bg-white border border-gray-200 rounded-2xl p-4 opacity-60 hover:opacity-100 transition-opacity">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-gray-700 truncate">
+                            {p?.title || `Job #${match.proposal_id}`}
+                          </p>
+                          {companyName && (
+                            <p className="text-xs text-gray-400 mt-0.5">
+                              {companyName}{p?.company?.industry ? ` · ${p.company.industry}` : ""}
+                            </p>
+                          )}
+                          {(p?.budget_min != null || p?.budget_max != null) && (
+                            <p className="text-xs text-gray-400 mt-0.5">
+                              Budget: ${p?.budget_min ?? "?"} – ${p?.budget_max ?? "?"}
+                              {p?.timeline ? `  ·  ${p.timeline}` : ""}
+                            </p>
+                          )}
+                        </div>
+                        <button
+                          className="btn-secondary shrink-0 flex items-center gap-1.5 text-xs px-3 py-1.5"
+                          disabled={busy}
+                          onClick={() => removeApproval(match.id)}
+                        >
+                          {busy
+                            ? <span className="w-3 h-3 border-2 border-gray-400/50 border-t-gray-600 rounded-full animate-spin" />
+                            : <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />}
+                          Undo Decline
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
       ) : (
+        /* ── Company: grouped by proposal with collapse ── */
         <div className="space-y-4">
           {Object.entries(groups).map(([key, group]) => (
-            <div
-              key={key}
-              className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm"
-            >
-              {/* Proposal header — click to collapse/expand */}
+            <div key={key} className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
               <button
                 onClick={() => toggleGroup(key)}
                 className="w-full flex items-center justify-between gap-2 px-5 py-3 bg-gray-50 border-b border-gray-200 hover:bg-gray-100 transition"
               >
                 <div className="flex items-center gap-2">
                   <Briefcase className="w-4 h-4 text-red-600 shrink-0" />
-                  <p className="text-sm font-semibold text-gray-800">
-                    {group.title}
-                  </p>
-                  <span className="text-xs text-gray-400">
-                    ({group.items.length})
-                  </span>
+                  <p className="text-sm font-semibold text-gray-800">{group.title}</p>
+                  <span className="text-xs text-gray-400">({group.items.length})</span>
                 </div>
-                <ChevronDown
-                  className={`w-4 h-4 text-gray-400 transition-transform ${collapsed[key] ? "-rotate-90" : ""}`}
-                />
+                <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${collapsed[key] ? "-rotate-90" : ""}`} />
               </button>
-
-              {/* Freelancer rows */}
               {!collapsed[key] && (
                 <ul className="divide-y divide-gray-100">
                   {group.items.map((match) => {
                     const actionable = needsAction(match);
                     const busy = respondingId === match.id;
                     return (
-                      <li
-                        key={match.id}
-                        className={`px-5 py-4 ${actionable ? "" : "opacity-70"}`}
-                      >
+                      <li key={match.id} className={`px-5 py-4 ${actionable ? "" : "opacity-70"}`}>
                         <div className="flex items-center justify-between gap-4 flex-wrap">
-                          {/* Name + category */}
                           <div className="min-w-0">
-                            <p className="text-sm font-semibold text-gray-900">
-                              {freelancerName(match)}
-                            </p>
+                            <p className="text-sm font-semibold text-gray-900">{freelancerName(match)}</p>
                             {match.freelancer?.freelance_category && (
-                              <p className="text-xs text-gray-400">
-                                {match.freelancer.freelance_category}
-                              </p>
+                              <p className="text-xs text-gray-400">{match.freelancer.freelance_category}</p>
                             )}
                           </div>
-
-                          {/* Status badge + links */}
                           <div className="flex items-center gap-3 flex-wrap">
-                            <span
-                              className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${STATUS_STYLE[match.status] || "bg-gray-100 text-gray-500"}`}
-                            >
+                            <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-50 text-gray-500 border border-gray-200">
+                              {Math.round(Number(match.match_score) * 100)}% match
+                            </span>
+                            <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${STATUS_STYLE[match.status] || "bg-gray-100 text-gray-500"}`}>
                               {match.status.replace(/_/g, " ")}
                             </span>
-                            <button
-                              onClick={() =>
-                                router.push(
-                                  `/home/profiles/${match.freelancer_user_id}`,
-                                )
-                              }
-                              className="inline-flex items-center gap-1 text-xs text-red-600 hover:underline"
-                            >
+                            <button onClick={() => router.push(`/home/profiles/${match.freelancer_user_id}`)} className="inline-flex items-center gap-1 text-xs text-red-600 hover:underline">
                               <User className="w-3.5 h-3.5" /> Profile
                             </button>
                             {match.freelancer?.cv_path && (
-                              <a
-                                href={`http://localhost:8000/api/users/${match.freelancer_user_id}/cv`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline"
-                              >
+                              <a href={`http://localhost:8000/api/users/${match.freelancer_user_id}/cv`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline">
                                 <FileText className="w-3.5 h-3.5" /> CV
                               </a>
                             )}
                           </div>
                         </div>
-
-                        {/* Action buttons */}
                         {actionable && (
                           <div className="flex gap-2 mt-3">
-                            <button
-                              className="btn flex-1 flex items-center justify-center gap-2 text-sm"
-                              disabled={busy}
-                              onClick={() => respond(match.id, true)}
-                            >
-                              {busy ? (
-                                <span className="w-3 h-3 border-2 border-white/50 border-t-white rounded-full animate-spin" />
-                              ) : (
-                                <CheckCircle2 className="w-4 h-4" />
-                              )}
-                              {role === "company" ? "Approve" : "Accept"}
+                            <button className="btn flex-1 flex items-center justify-center gap-2 text-sm" disabled={busy} onClick={() => respond(match.id, true)}>
+                              {busy ? <span className="w-3 h-3 border-2 border-white/50 border-t-white rounded-full animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                              Approve
                             </button>
-                            <button
-                              className="btn-secondary flex items-center justify-center gap-2 text-sm px-4"
-                              disabled={busy}
-                              onClick={() => respond(match.id, false)}
-                            >
-                              <XCircle className="w-4 h-4 text-red-500" />{" "}
-                              Reject
+                            <button className="btn-secondary flex items-center justify-center gap-2 text-sm px-4" disabled={busy} onClick={() => respond(match.id, false)}>
+                              <XCircle className="w-4 h-4 text-red-500" /> Reject
                             </button>
                           </div>
                         )}
-
                         {canRemoveApproval(match) && !actionable && (
                           <div className="mt-3">
-                            <button
-                              className="btn-secondary flex items-center gap-2 text-sm px-4"
-                              disabled={busy}
-                              onClick={() => removeApproval(match.id)}
-                            >
-                              <XCircle className="w-4 h-4 text-gray-500" />{" "}
-                              Remove Approval
+                            <button className="btn-secondary flex items-center gap-2 text-sm px-4" disabled={busy} onClick={() => removeApproval(match.id)}>
+                              <XCircle className="w-4 h-4 text-gray-500" /> Remove Approval
                             </button>
                           </div>
                         )}

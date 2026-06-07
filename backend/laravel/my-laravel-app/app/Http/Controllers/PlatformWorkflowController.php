@@ -90,11 +90,6 @@ class PlatformWorkflowController extends Controller
         } catch (\Throwable) {
         }
 
-        // Re-run matching for all open proposals so this new freelancer is considered
-        Proposal::where('status', 'open')->each(function ($proposal) {
-            $this->doRunMatches($proposal);
-        });
-
         return response()->json([
             'message' => 'Freelancer profile saved successfully',
             'profile' => $profile,
@@ -148,18 +143,17 @@ class PlatformWorkflowController extends Controller
             return $actor;
         }
 
-        $query = Proposal::query()->latest();
+        $query = Proposal::with('company')->latest();
 
         if ($actor->role === 'company') {
             $query->where('company_user_id', $actor->id);
-        } else {
-            $query->whereIn('status', ['open', 'matched']);
         }
+        // freelancers see all proposals
 
         return response()->json($query->get());
     }
 
-    private function doRunMatches(Proposal $proposal): array
+    public function doRunMatches(Proposal $proposal): array
     {
         $fastApiBase = rtrim(env('FASTAPI_URL', 'http://localhost:8001/api'), '/');
 
@@ -285,14 +279,25 @@ class PlatformWorkflowController extends Controller
         foreach ($allScores as $item) {
             if (!isset($item['user_id'])) continue;
 
-            $saved[] = ProposalMatch::updateOrCreate(
-                ['proposal_id' => $proposal->id, 'freelancer_user_id' => $item['user_id']],
-                [
-                    'match_score'  => min(1.0, max(0.0, (float) ($item['score'] ?? 0))),
-                    'model_source' => $item['model_source'] ?? 'bert_mpnet_multisignal',
-                    'status'       => 'pending',
-                ]
-            );
+            $score  = min(1.0, max(0.0, (float) ($item['score'] ?? 0)));
+            $source = $item['model_source'] ?? 'bert_mpnet_multisignal';
+
+            $existing = ProposalMatch::where('proposal_id', $proposal->id)
+                ->where('freelancer_user_id', $item['user_id'])
+                ->first();
+
+            if ($existing) {
+                $existing->update(['match_score' => $score, 'model_source' => $source]);
+                $saved[] = $existing;
+            } else {
+                $saved[] = ProposalMatch::create([
+                    'proposal_id'        => $proposal->id,
+                    'freelancer_user_id' => $item['user_id'],
+                    'match_score'        => $score,
+                    'model_source'       => $source,
+                    'status'             => 'pending',
+                ]);
+            }
         }
 
         if (count($saved) > 0) {
@@ -322,6 +327,45 @@ class PlatformWorkflowController extends Controller
         ]);
     }
 
+    public function applyToProposal(Request $request, int $proposalId): JsonResponse
+    {
+        $actor = $this->actorRequired($request);
+        if ($actor instanceof JsonResponse) return $actor;
+
+        if ($actor->role !== 'freelancer') {
+            return response()->json(['message' => 'Only freelancers can apply to proposals'], 403);
+        }
+
+        $proposal = Proposal::findOrFail($proposalId);
+
+        if (!in_array($proposal->status, ['open', 'matched'])) {
+            return response()->json(['message' => 'This proposal is not accepting applications'], 422);
+        }
+
+        $existing = ProposalMatch::where('proposal_id', $proposalId)
+            ->where('freelancer_user_id', $actor->id)
+            ->first();
+
+        if ($existing) {
+            if ($existing->status === 'rejected') {
+                $existing->status = 'freelancer_approved';
+                $existing->save();
+                return response()->json(['message' => 'Application re-submitted', 'match' => $existing]);
+            }
+            return response()->json(['message' => 'Already applied', 'match' => $existing]);
+        }
+
+        $match = ProposalMatch::create([
+            'proposal_id'        => $proposalId,
+            'freelancer_user_id' => $actor->id,
+            'match_score'        => 0.1,
+            'model_source'       => 'self_applied',
+            'status'             => 'freelancer_approved',
+        ]);
+
+        return response()->json(['message' => 'Application submitted', 'match' => $match], 201);
+    }
+
     public function listMatches(Request $request): JsonResponse
     {
         $actor = $this->actorRequired($request);
@@ -329,7 +373,7 @@ class PlatformWorkflowController extends Controller
             return $actor;
         }
 
-        $query = ProposalMatch::with(['proposal', 'freelancer']);
+        $query = ProposalMatch::with(['proposal.company', 'freelancer']);
 
         if ($actor->role === 'freelancer') {
             $query->where('freelancer_user_id', $actor->id);
@@ -378,6 +422,13 @@ class PlatformWorkflowController extends Controller
         }
 
         if (!empty($data['remove_approval'])) {
+            // Allow undoing a rejection (either side) — resets back to pending
+            if ($match->status === 'rejected') {
+                $match->status = 'pending';
+                $match->save();
+                return response()->json(['message' => 'Rejection undone', 'match' => $match]);
+            }
+
             if ($actor->role === 'company') {
                 if ($match->status === 'company_approved') {
                     $match->status = 'pending';
@@ -436,10 +487,18 @@ class PlatformWorkflowController extends Controller
 
         $data = $validator->validated();
         $actor = User::find($data['actor_user_id']);
-        $match = ProposalMatch::find($data['proposal_match_id']);
+        $match = ProposalMatch::with('proposal')->find($data['proposal_match_id']);
 
-        if (!$actor || $actor->role !== 'company' || $actor->id !== (int) $data['company_user_id']) {
-            return response()->json(['message' => 'Only the company actor can create meeting requests'], 403);
+        if (!$actor || !in_array($actor->role, ['company', 'freelancer'])) {
+            return response()->json(['message' => 'Only a company or freelancer actor can create meeting requests'], 403);
+        }
+
+        if ($actor->role === 'company' && $actor->id !== (int) $data['company_user_id']) {
+            return response()->json(['message' => 'Company actor must match company_user_id'], 403);
+        }
+
+        if ($actor->role === 'freelancer' && $actor->id !== (int) $data['freelancer_user_id']) {
+            return response()->json(['message' => 'Freelancer actor must match freelancer_user_id'], 403);
         }
 
         if (!$match || $match->status !== 'mutual_approved') {
@@ -452,9 +511,11 @@ class PlatformWorkflowController extends Controller
 
         unset($data['actor_user_id']);
 
+        $pendingStatus = $actor->role === 'company' ? 'pending_freelancer' : 'pending_company';
+
         $meeting = MeetingRequest::create([
             ...$data,
-            'status' => 'pending_freelancer',
+            'status' => $pendingStatus,
         ]);
 
         return response()->json(['message' => 'Meeting request created', 'meeting_request' => $meeting], 201);
@@ -466,6 +527,7 @@ class PlatformWorkflowController extends Controller
             'actor_user_id' => 'required|exists:users,id',
             'action' => 'required|in:approve,edit,reject',
             'new_time' => 'nullable|date',
+            'notes' => 'nullable|string|max:1000',
         ]);
 
         if ($validator->fails()) {
@@ -495,30 +557,29 @@ class PlatformWorkflowController extends Controller
         }
 
         if ($data['action'] === 'edit') {
-            if (empty($data['new_time'])) {
-                return response()->json(['message' => 'new_time is required for edit action'], 422);
-            }
             if ($actor->role === 'freelancer') {
-                $meeting->freelancer_proposed_at = $data['new_time'];
+                if (!empty($data['new_time'])) $meeting->freelancer_proposed_at = $data['new_time'];
                 $meeting->status = 'pending_company';
             } else {
-                $meeting->proposed_at = $data['new_time'];
+                if (!empty($data['new_time'])) $meeting->proposed_at = $data['new_time'];
                 $meeting->status = 'pending_freelancer';
             }
+            if (isset($data['notes'])) $meeting->notes = $data['notes'];
             $meeting->save();
-            return response()->json(['message' => 'Meeting time updated', 'meeting_request' => $meeting]);
+            return response()->json(['message' => 'Meeting updated', 'meeting_request' => $meeting]);
         }
 
-        if ($actor->role === 'company' && $meeting->status === 'pending_company') {
-            $meeting->status = 'approved';
-        } elseif ($actor->role === 'freelancer' && $meeting->status === 'pending_freelancer') {
-            $meeting->status = 'approved';
-        } else {
+        $approvableStatuses = $actor->role === 'company'
+            ? ['pending_company']
+            : ['pending_freelancer'];
+
+        if (!in_array($meeting->status, $approvableStatuses)) {
             return response()->json([
                 'message' => 'This actor cannot approve the meeting in current state',
                 'meeting_request' => $meeting,
             ], 422);
         }
+        $meeting->status = 'approved';
 
         $meeting->google_meet_link = $meeting->google_meet_link ?: $this->generateMeetLink();
         $meeting->save();
