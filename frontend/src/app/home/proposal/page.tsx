@@ -148,7 +148,7 @@ export default function HomeProposalPage() {
     }
     setSubmitting(true);
     try {
-      await api.post("/proposals", {
+      const res = await api.post("/proposals", {
         actor_user_id: userId,
         company_user_id: userId,
         title: form.title.trim(),
@@ -160,8 +160,13 @@ export default function HomeProposalPage() {
       });
       setForm(EMPTY_FORM);
       setModalOpen(false);
-      showToast("success", "Proposal posted successfully.");
+      showToast("success", "Proposal posted! AI matching is running in the background…");
       await loadProposals();
+      // Fire matching without blocking — result visible after a manual reload or re-run
+      const newId = res.data?.proposal?.id;
+      if (newId) {
+        api.post(`/proposals/${newId}/match`, { actor_user_id: userId }).catch(() => {});
+      }
     } catch (err) {
       const e = err as { response?: { data?: { message?: string } }; message?: string };
       showToast("error", e.response?.data?.message || e.message || "Proposal creation failed.");

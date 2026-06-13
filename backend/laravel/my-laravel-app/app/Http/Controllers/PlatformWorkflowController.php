@@ -126,13 +126,9 @@ class PlatformWorkflowController extends Controller
         unset($data['actor_user_id']);
         $proposal = Proposal::create($data);
 
-        // Auto-run BERT matching immediately after creation
-        $matches = $this->doRunMatches($proposal);
-
         return response()->json([
-            'message' => 'Proposal created and AI matching ran automatically',
+            'message' => 'Proposal created',
             'proposal' => $proposal,
-            'matches_count' => count($matches),
         ], 201);
     }
 
@@ -515,7 +511,8 @@ class PlatformWorkflowController extends Controller
 
         $meeting = MeetingRequest::create([
             ...$data,
-            'status' => $pendingStatus,
+            'status'       => $pendingStatus,
+            'creator_role' => $actor->role,
         ]);
 
         return response()->json(['message' => 'Meeting request created', 'meeting_request' => $meeting], 201);
@@ -597,7 +594,7 @@ class PlatformWorkflowController extends Controller
             return $actor;
         }
 
-        $query = MeetingRequest::with(['proposalMatch', 'company', 'freelancer'])->latest();
+        $query = MeetingRequest::with(['proposalMatch', 'company', 'freelancer', 'decision'])->latest();
 
         if ($actor->role === 'company') {
             $query->where('company_user_id', $actor->id);
@@ -611,44 +608,88 @@ class PlatformWorkflowController extends Controller
     public function recordServiceDecision(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'actor_user_id' => 'required|exists:users,id',
+            'actor_user_id'      => 'required|exists:users,id',
             'meeting_request_id' => 'required|exists:meeting_requests,id',
-            'company_user_id' => 'required|exists:users,id',
-            'freelancer_user_id' => 'required|exists:users,id',
-            'decision' => 'required|in:approved,denied',
-            'feedback' => 'nullable|string',
+            'decision'           => 'required|in:approved,denied',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
         }
 
-        $data = $validator->validated();
-        $actor = User::find($data['actor_user_id']);
+        $data    = $validator->validated();
+        $actor   = User::find($data['actor_user_id']);
         $meeting = MeetingRequest::find($data['meeting_request_id']);
 
-        if (!$actor || $actor->role !== 'company' || $actor->id !== (int) $data['company_user_id']) {
-            return response()->json(['message' => 'Only company actor can submit this notification decision'], 403);
+        if (!$actor || !in_array($actor->role, ['company', 'freelancer'])) {
+            return response()->json(['message' => 'Invalid actor'], 403);
         }
 
         if (!$meeting || $meeting->status !== 'approved') {
-            return response()->json(['message' => 'Meeting must be approved before sending notification decision'], 422);
+            return response()->json(['message' => 'Meeting must be approved before submitting a decision'], 422);
         }
 
-        if ($meeting->company_user_id !== (int) $data['company_user_id'] || $meeting->freelancer_user_id !== (int) $data['freelancer_user_id']) {
-            return response()->json(['message' => 'Meeting participants mismatch for decision'], 422);
+        if ($actor->role === 'company' && $meeting->company_user_id !== $actor->id) {
+            return response()->json(['message' => 'Not your meeting'], 403);
         }
 
-        unset($data['actor_user_id']);
+        if ($actor->role === 'freelancer' && $meeting->freelancer_user_id !== $actor->id) {
+            return response()->json(['message' => 'Not your meeting'], 403);
+        }
 
-        $decision = ServiceDecision::updateOrCreate(
-            ['meeting_request_id' => $data['meeting_request_id']],
-            $data
-        );
+        $record = ServiceDecision::firstOrNew(['meeting_request_id' => $meeting->id]);
+        $record->meeting_request_id  = $meeting->id;
+        $record->company_user_id     = $meeting->company_user_id;
+        $record->freelancer_user_id  = $meeting->freelancer_user_id;
+        $record->decision            = $data['decision'];
+
+        if ($actor->role === 'company') {
+            $record->company_decision = $data['decision'];
+        } else {
+            $record->freelancer_decision = $data['decision'];
+        }
+
+        $record->save();
+
+        $bothApproved = $record->company_decision === 'approved'
+                     && $record->freelancer_decision === 'approved';
+
+        $contract = null;
+        if ($bothApproved) {
+            $match    = ProposalMatch::find($meeting->proposal_match_id);
+            $proposal = $match ? Proposal::find($match->proposal_id) : null;
+
+            $existing = $match ? Contract::where('proposal_match_id', $match->id)->first() : null;
+
+            if ($match && $proposal && !$existing) {
+                $budgetStr = ($proposal->budget_min && $proposal->budget_max)
+                    ? "\${$proposal->budget_min} – \${$proposal->budget_max}"
+                    : 'As mutually agreed';
+
+                $details = [
+                    'scope'          => $proposal->description ?? 'Services as described in the proposal.',
+                    'payment_terms'  => $budgetStr,
+                    'timeline'       => $proposal->timeline ?? 'As mutually agreed',
+                ];
+
+                $contract = Contract::create([
+                    'proposal_match_id'  => $match->id,
+                    'company_user_id'    => $meeting->company_user_id,
+                    'freelancer_user_id' => $meeting->freelancer_user_id,
+                    'details'            => $details,
+                    'contract_text'      => $this->generateContractText($details),
+                    'status'             => 'draft',
+                ]);
+            } else {
+                $contract = $existing;
+            }
+        }
 
         return response()->json([
-            'message' => 'Decision recorded and freelancer can be notified',
-            'service_decision' => $decision,
+            'message'          => 'Decision recorded',
+            'service_decision' => $record,
+            'both_approved'    => $bothApproved,
+            'contract'         => $contract,
         ]);
     }
 
@@ -697,6 +738,34 @@ class PlatformWorkflowController extends Controller
             'message' => 'Contract draft created',
             'contract' => $contract,
         ], 201);
+    }
+
+    public function updateContract(Request $request, int $contractId): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'actor_user_id' => 'required|exists:users,id',
+            'contract_text' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
+        }
+
+        $contract = Contract::findOrFail($contractId);
+        $actor    = User::find($request->input('actor_user_id'));
+
+        if (!$actor || $actor->role !== 'company' || $contract->company_user_id !== $actor->id) {
+            return response()->json(['message' => 'Only the company owner can edit this contract'], 403);
+        }
+
+        if ($contract->status !== 'draft') {
+            return response()->json(['message' => 'Contract can only be edited while in draft status'], 422);
+        }
+
+        $contract->contract_text = $validator->validated()['contract_text'];
+        $contract->save();
+
+        return response()->json(['message' => 'Contract updated', 'contract' => $contract]);
     }
 
     public function signContract(Request $request, int $contractId): JsonResponse
@@ -801,7 +870,9 @@ class PlatformWorkflowController extends Controller
             'assigned_to_user_id' => 'nullable|exists:users,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'status' => 'nullable|in:todo,in_progress,done',
+            'notes' => 'nullable|string',
+            'attachments' => 'nullable|array',
+            'status' => 'nullable|string|max:100',
             'priority' => 'nullable|in:low,medium,high',
             'due_date' => 'nullable|date',
             'order_index' => 'nullable|integer|min:0',
@@ -840,7 +911,9 @@ class PlatformWorkflowController extends Controller
             'assigned_to_user_id' => 'nullable|exists:users,id',
             'title' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'status' => 'nullable|in:todo,in_progress,done',
+            'notes' => 'nullable|string',
+            'attachments' => 'nullable|array',
+            'status' => 'nullable|string|max:100',
             'priority' => 'nullable|in:low,medium,high',
             'due_date' => 'nullable|date',
             'order_index' => 'nullable|integer|min:0',
@@ -869,6 +942,58 @@ class PlatformWorkflowController extends Controller
         ]);
     }
 
+    public function finalizeContract(Request $request, int $contractId): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'actor_user_id'   => 'required|exists:users,id',
+            'payment_notes'   => 'nullable|string',
+            'confirmed'       => 'required|boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
+        }
+
+        $contract = Contract::findOrFail($contractId);
+        $actor    = User::find($request->input('actor_user_id'));
+
+        if (!$actor || !in_array($actor->id, [$contract->company_user_id, $contract->freelancer_user_id])) {
+            return response()->json(['message' => 'Not allowed to finalize this contract'], 403);
+        }
+
+        if ($contract->status !== 'active') {
+            return response()->json(['message' => 'Contract must be active before finalizing'], 422);
+        }
+
+        if (!$request->input('confirmed')) {
+            return response()->json(['message' => 'Confirmation required'], 422);
+        }
+
+        $contract->status = 'completed';
+        if ($request->input('payment_notes')) {
+            $details = is_array($contract->details) ? $contract->details : [];
+            $details['payment_notes'] = $request->input('payment_notes');
+            $contract->details = $details;
+        }
+        $contract->save();
+
+        return response()->json(['message' => 'Contract finalized and marked as completed', 'contract' => $contract]);
+    }
+
+    public function deleteTask(Request $request, int $taskId): JsonResponse
+    {
+        $task     = Task::findOrFail($taskId);
+        $contract = Contract::find($task->contract_id);
+        $actor    = User::find((int) $request->input('actor_user_id'));
+
+        if (!$contract || !$actor || !in_array($actor->id, [$contract->company_user_id, $contract->freelancer_user_id])) {
+            return response()->json(['message' => 'Not allowed to delete this task'], 403);
+        }
+
+        $task->delete();
+        return response()->json(['message' => 'Task deleted']);
+    }
+
     private function generateContractText(array $details): string
     {
         try {
@@ -892,11 +1017,7 @@ class PlatformWorkflowController extends Controller
 
     private function generateMeetLink(): string
     {
-        $alphabet = 'abcdefghijklmnopqrstuvwxyz';
-        $partA = substr(str_shuffle($alphabet), 0, 3);
-        $partB = substr(str_shuffle($alphabet), 0, 4);
-        $partC = substr(str_shuffle($alphabet), 0, 3);
-
-        return "https://meet.google.com/{$partA}-{$partB}-{$partC}";
+        $roomId = 'FreelanceReach-' . strtoupper(substr(bin2hex(random_bytes(6)), 0, 10));
+        return "https://meet.jit.si/{$roomId}";
     }
 }

@@ -15,6 +15,8 @@ class Task extends Model
         'assigned_to_user_id',
         'title',
         'description',
+        'notes',
+        'attachments',
         'status',
         'priority',
         'due_date',
@@ -22,7 +24,8 @@ class Task extends Model
     ];
 
     protected $casts = [
-        'due_date' => 'date',
+        'due_date'    => 'date',
+        'attachments' => 'array',
     ];
 
     public function contract(): BelongsTo

@@ -35,6 +35,7 @@ export function useNotificationCounts(
 ) {
   const [counts, setCounts] = useState<NotificationCounts>({ approvals: 0, meetings: 0, notifications: 0 });
   const prevRef = useRef<NotificationCounts>({ approvals: 0, meetings: 0, notifications: 0 });
+  const rawPrevRef = useRef({ approvals: 0, meetings: 0 });
   const notifIdRef = useRef(0);
 
   useEffect(() => {
@@ -64,16 +65,17 @@ export function useNotificationCounts(
         notifications: Math.max(0, (approvals + pendingMeetings) - (seen.approvals + seen.meetings)),
       };
 
-      // Detect new items since last poll
-      const prev = prevRef.current;
+      // Detect new items by comparing raw counts (not badge counts which are affected by seen offsets)
+      const rawPrev = rawPrevRef.current;
       if (onLiveNotification) {
-        if (newCounts.meetings > prev.meetings) {
+        if (pendingMeetings > rawPrev.meetings) {
           onLiveNotification({ id: ++notifIdRef.current, message: "You have a new meeting request" });
-        } else if (newCounts.approvals > prev.approvals) {
+        } else if (approvals > rawPrev.approvals) {
           onLiveNotification({ id: ++notifIdRef.current, message: "A new match is awaiting your approval" });
         }
       }
 
+      rawPrevRef.current = { approvals, meetings: pendingMeetings };
       prevRef.current = newCounts;
       setCounts(newCounts);
     };

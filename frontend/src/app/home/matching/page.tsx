@@ -121,14 +121,10 @@ export default function HomeMatchingPage() {
   }, [userId, role]);
 
   useEffect(() => {
-    if (role === "company") {
-      rerunAndRefresh();
-    } else {
-      loadMatches();
-    }
+    loadMatches();
     const interval = setInterval(() => loadMatches(true), 30_000);
     return () => clearInterval(interval);
-  }, [loadMatches, rerunAndRefresh, role]);
+  }, [loadMatches]);
 
   const respond = async (matchId: number, approve: boolean) => {
     setRespondingId(matchId);

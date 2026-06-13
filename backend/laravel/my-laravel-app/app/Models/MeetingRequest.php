@@ -20,6 +20,7 @@ class MeetingRequest extends Model
         'status',
         'google_meet_link',
         'notes',
+        'creator_role',
     ];
 
     protected $casts = [

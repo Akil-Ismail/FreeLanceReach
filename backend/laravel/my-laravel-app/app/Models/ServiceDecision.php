@@ -15,6 +15,8 @@ class ServiceDecision extends Model
         'company_user_id',
         'freelancer_user_id',
         'decision',
+        'company_decision',
+        'freelancer_decision',
         'feedback',
     ];
 

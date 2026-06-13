@@ -56,12 +56,15 @@ Route::middleware('auth.token')->group(function () {
     // Contracts
     Route::get('/contracts', [PlatformWorkflowController::class, 'listContracts']);
     Route::post('/contracts', [PlatformWorkflowController::class, 'createContractDraft']);
+    Route::put('/contracts/{contractId}', [PlatformWorkflowController::class, 'updateContract']);
     Route::post('/contracts/{contractId}/sign', [PlatformWorkflowController::class, 'signContract']);
+    Route::post('/contracts/{contractId}/finalize', [PlatformWorkflowController::class, 'finalizeContract']);
 
     // Tasks
     Route::get('/tasks', [PlatformWorkflowController::class, 'listTasks']);
     Route::post('/tasks', [PlatformWorkflowController::class, 'createTask']);
     Route::put('/tasks/{taskId}', [PlatformWorkflowController::class, 'updateTask']);
+    Route::delete('/tasks/{taskId}', [PlatformWorkflowController::class, 'deleteTask']);
 
     // Chat history & profile for AI chatbot
     Route::get('/chat/history', [ChatController::class, 'history']);

@@ -52,28 +52,14 @@ const FREELANCER_QUESTIONS = [
 ];
 
 const COMPANY_QUESTIONS = [
-  {
-    key: "company_name",
-    label: "Company Name",
-    hint: "Your company's full name",
-  },
-  { key: "industry", label: "Industry", hint: "e.g. Technology, Healthcare" },
-  {
-    key: "contact_first_name",
-    label: "Your First Name",
-    hint: "Primary contact",
-  },
-  {
-    key: "contact_last_name",
-    label: "Your Last Name",
-    hint: "Primary contact",
-  },
-  {
-    key: "company_description",
-    label: "Company Description",
-    hint: "2–3 sentences about what you do",
-  },
-  { key: "phone_number", label: "Phone Number", hint: "Optional" },
+  { key: "company_name",        label: "Company Name",        hint: "Your company's full name" },
+  { key: "industry",            label: "Industry",            hint: "e.g. Technology, Healthcare, Finance" },
+  { key: "company_size",        label: "Company Size",        hint: "1-10 / 10-50 / 50-200 / 200+ employees" },
+  { key: "company_description", label: "Company Description", hint: "2–3 sentences about what your company does" },
+  { key: "company_website",     label: "Company Website",     hint: "https://... or type skip" },
+  { key: "contact_first_name",  label: "Your First Name",     hint: "Primary contact first name" },
+  { key: "contact_last_name",   label: "Your Last Name",      hint: "Primary contact last name" },
+  { key: "phone_number",        label: "Phone Number",        hint: "Optional — e.g. +1 555 123 4567" },
 ];
 
 function toTitleCase(s: string) {
@@ -91,8 +77,19 @@ function parseAnswer(key: string, raw: string): string {
     return text;
   }
 
-  if (key === "portfolio_url") {
+  if (key === "portfolio_url" || key === "company_website") {
     if (/^(skip|n\/a|none|no)$/i.test(text)) return "";
+    if (text && !/^https?:\/\//i.test(text)) return `https://${text}`;
+    return text;
+  }
+
+  if (key === "company_size") {
+    const n = parseInt(text.replace(/[^\d]/g, ""), 10);
+    const lower = text.toLowerCase();
+    if (lower.includes("200+") || lower.includes("200 +") || (!isNaN(n) && n > 200)) return "200+";
+    if (lower.includes("50-200") || lower.includes("50 to 200") || (!isNaN(n) && n > 50)) return "50-200";
+    if (lower.includes("10-50") || lower.includes("10 to 50") || (!isNaN(n) && n > 10)) return "10-50";
+    if (lower.includes("1-10") || lower.includes("1 to 10") || (!isNaN(n) && n >= 1)) return "1-10";
     return text;
   }
 
@@ -185,7 +182,7 @@ export default function SetupPage() {
 
     const welcome =
       role === "company"
-        ? "Welcome! I'll guide you through setting up your employer profile with a few quick questions.\n\nLet's start — what is your **company name**?"
+        ? "Welcome! I'll guide you through setting up your employer profile with 8 quick questions.\n\nLet's start — what is your **company name**? (e.g. Oryx, ABC Corporation)"
         : "Welcome! I'll help you build a strong freelancer profile step by step.\n\nLet's start — what is your **professional headline**? (e.g. *Senior React Developer*)";
 
     setMessages([{ role: "assistant", content: welcome }]);
@@ -323,12 +320,14 @@ export default function SetupPage() {
     try {
       if (role === "company") {
         const res = await api.put(`/users/${userId}`, {
-          company_name: formValues.company_name || "",
-          contact_first_name: formValues.contact_first_name || "",
-          contact_last_name: formValues.contact_last_name || "",
-          industry: formValues.industry || "",
+          company_name:        formValues.company_name        || "",
+          industry:            formValues.industry            || "",
+          company_size:        formValues.company_size        || "",
           company_description: formValues.company_description || "",
-          phone_number: formValues.phone_number || "",
+          company_website:     formValues.company_website     || "",
+          contact_first_name:  formValues.contact_first_name  || "",
+          contact_last_name:   formValues.contact_last_name   || "",
+          phone_number:        formValues.phone_number        || "",
         });
         setCachedValue(`user:profile:${userId}`, res.data?.user || {});
       } else {
