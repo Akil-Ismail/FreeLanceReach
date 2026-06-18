@@ -22,7 +22,12 @@ type MeetingItem = {
   company?: { company_name?: string; contact_first_name?: string };
   freelancer?: { first_name?: string; last_name?: string; email?: string };
 };
-type ContractItem = { id: number; status: string; title?: string };
+type ContractItem = {
+  id: number;
+  status: string;
+  company?: { company_name?: string; contact_first_name?: string; contact_last_name?: string };
+  freelancer?: { first_name?: string; last_name?: string; email?: string };
+};
 
 const STATUS_STYLE: Record<string, string> = {
   company_approved:    "bg-blue-50 text-blue-700",
@@ -133,8 +138,8 @@ export default function HomeNotificationsPage() {
           {/* ── Matches grouped by proposal ── */}
           {matches.length > 0 && (
             <div className="space-y-4">
-              {Object.values(proposalGroups).map((group) => (
-                <div key={group.title} className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+              {Object.entries(proposalGroups).map(([proposalId, group]) => (
+                <div key={proposalId} className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
                   <div className="px-5 py-3 bg-gray-50 border-b border-gray-200">
                     <p className="text-sm font-semibold text-gray-800">{group.title}</p>
                   </div>
@@ -200,7 +205,11 @@ export default function HomeNotificationsPage() {
               <ul className="divide-y divide-gray-100">
                 {contracts.map((c) => (
                   <li key={c.id} className="flex items-center justify-between px-5 py-3 gap-4">
-                    <span className="text-sm text-gray-700">{c.title || `Contract #${c.id}`}</span>
+                    <span className="text-sm text-gray-700">
+                      {role === "freelancer"
+                        ? `Contract with ${c.company?.company_name || [c.company?.contact_first_name, c.company?.contact_last_name].filter(Boolean).join(" ") || `Company`}`
+                        : `Contract with ${[c.freelancer?.first_name, c.freelancer?.last_name].filter(Boolean).join(" ") || c.freelancer?.email || `Freelancer`}`}
+                    </span>
                     <StatusBadge status={c.status} />
                   </li>
                 ))}

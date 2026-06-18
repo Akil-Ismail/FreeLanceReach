@@ -10,6 +10,7 @@ import {
   User,
   Briefcase,
   ChevronDown,
+  Building2,
 } from "lucide-react";
 import SearchBar from "@/components/protected/SearchBar";
 import api from "@/lib/api";
@@ -30,7 +31,8 @@ type Match = {
     budget_min?: number | null;
     budget_max?: number | null;
     timeline?: string | null;
-    company?: { company_name?: string; contact_first_name?: string; contact_last_name?: string; industry?: string };
+    company_user_id?: number;
+    company?: { id?: number; company_name?: string; contact_first_name?: string; contact_last_name?: string; industry?: string };
   };
   freelancer?: {
     first_name?: string;
@@ -48,6 +50,8 @@ const STATUS_STYLE: Record<string, string> = {
   mutual_approved: "bg-emerald-50 text-emerald-700",
   rejected: "bg-red-50 text-red-600",
 };
+
+const displayScore = (raw: number) => Math.min(100, Math.round(raw * 100) + 30);
 
 export default function HomeMatchingPage() {
   const router = useRouter();
@@ -204,7 +208,7 @@ export default function HomeMatchingPage() {
   const declined = matches.filter((m) => m.status === "rejected");
 
   const visible = matches
-    .filter((m) => Math.round(Number(m.match_score) * 100) > 10)
+    .filter((m) => displayScore(Number(m.match_score)) >= 50)
     .filter((m) => m.status !== "rejected")
     .filter((m) => {
       if (!query.trim()) return true;
@@ -303,6 +307,9 @@ export default function HomeMatchingPage() {
                       <h3 className="text-sm font-semibold text-gray-900 truncate">
                         {p?.title || `Job #${match.proposal_id}`}
                       </h3>
+                      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-50 text-gray-500 border border-gray-200 shrink-0">
+                        {displayScore(Number(match.match_score))}% match
+                      </span>
                       <span className={`text-xs font-medium px-2 py-0.5 rounded-full capitalize shrink-0 ${STATUS_STYLE[match.status] || "bg-gray-100 text-gray-500"}`}>
                         {match.status.replace(/_/g, " ")}
                       </span>
@@ -314,6 +321,14 @@ export default function HomeMatchingPage() {
                     )}
                     {p?.description && (
                       <p className="text-sm text-gray-600 line-clamp-2">{p.description}</p>
+                    )}
+                    {(p?.company_user_id || p?.company?.id) && (
+                      <button
+                        onClick={() => router.push(`/home/profiles/${p!.company_user_id ?? p!.company!.id}`)}
+                        className="mt-2 inline-flex items-center gap-1 text-xs text-red-600 hover:underline"
+                      >
+                        <Building2 className="w-3.5 h-3.5" /> Company Profile
+                      </button>
                     )}
                     <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400">
                       {(p?.budget_min != null || p?.budget_max != null) && (
@@ -369,9 +384,14 @@ export default function HomeMatchingPage() {
                     <div key={match.id} className="bg-white border border-gray-200 rounded-2xl p-4 opacity-60 hover:opacity-100 transition-opacity">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <p className="text-sm font-semibold text-gray-700 truncate">
-                            {p?.title || `Job #${match.proposal_id}`}
-                          </p>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="text-sm font-semibold text-gray-700 truncate">
+                              {p?.title || `Job #${match.proposal_id}`}
+                            </p>
+                            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-50 text-gray-400 border border-gray-200 shrink-0">
+                              {displayScore(Number(match.match_score))}% match
+                            </span>
+                          </div>
                           {companyName && (
                             <p className="text-xs text-gray-400 mt-0.5">
                               {companyName}{p?.company?.industry ? ` · ${p.company.industry}` : ""}
@@ -407,17 +427,23 @@ export default function HomeMatchingPage() {
         <div className="space-y-4">
           {Object.entries(groups).map(([key, group]) => (
             <div key={key} className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-              <button
-                onClick={() => toggleGroup(key)}
-                className="w-full flex items-center justify-between gap-2 px-5 py-3 bg-gray-50 border-b border-gray-200 hover:bg-gray-100 transition"
-              >
-                <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between gap-2 px-5 py-3 bg-gray-50 border-b border-gray-200">
+                <button
+                  onClick={() => toggleGroup(key)}
+                  className="flex items-center gap-2 flex-1 min-w-0 hover:opacity-80 transition text-left"
+                >
                   <Briefcase className="w-4 h-4 text-red-600 shrink-0" />
-                  <p className="text-sm font-semibold text-gray-800">{group.title}</p>
-                  <span className="text-xs text-gray-400">({group.items.length})</span>
-                </div>
-                <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${collapsed[key] ? "-rotate-90" : ""}`} />
-              </button>
+                  <p className="text-sm font-semibold text-gray-800 truncate">{group.title}</p>
+                  <span className="text-xs text-gray-400 shrink-0">({group.items.length})</span>
+                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform shrink-0 ${collapsed[key] ? "-rotate-90" : ""}`} />
+                </button>
+                <button
+                  onClick={() => router.push(`/home/profiles/${userId}`)}
+                  className="inline-flex items-center gap-1 text-xs text-red-600 hover:underline shrink-0"
+                >
+                  <Building2 className="w-3.5 h-3.5" /> Company Profile
+                </button>
+              </div>
               {!collapsed[key] && (
                 <ul className="divide-y divide-gray-100">
                   {group.items.map((match) => {
@@ -434,7 +460,7 @@ export default function HomeMatchingPage() {
                           </div>
                           <div className="flex items-center gap-3 flex-wrap">
                             <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-50 text-gray-500 border border-gray-200">
-                              {Math.round(Number(match.match_score) * 100)}% match
+                              {displayScore(Number(match.match_score))}% match
                             </span>
                             <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${STATUS_STYLE[match.status] || "bg-gray-100 text-gray-500"}`}>
                               {match.status.replace(/_/g, " ")}

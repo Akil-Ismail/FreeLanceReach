@@ -20,6 +20,8 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+import numpy as np
+
 COLLECTION = "freelancer_profiles_v2"   # v2 = 768-dim; old 384-dim collection stays untouched
 VECTOR_SIZE = 768
 
@@ -69,6 +71,9 @@ class BertMatchingService:
         self.dataset: List[Dict[str, Any]] = []
         self._initialized = False
         self._qdrant = None
+        # Cache proposal embeddings so a single matching run never encodes the
+        # same proposal text twice (search_qdrant + score_matches both need it).
+        self._proposal_cache: Dict[str, np.ndarray] = {}
 
     # ------------------------------------------------------------------ init
 
@@ -115,6 +120,23 @@ class BertMatchingService:
         except Exception:
             return 0
 
+    # ------------------------------------------------------------------ encoding helpers
+
+    def _encode_proposal_cached(self, proposal: Dict[str, Any]) -> "np.ndarray | None":
+        """Encode proposal text once per pipeline run and cache the result."""
+        if not self.model:
+            return None
+        text = self._proposal_text(proposal)
+        if text not in self._proposal_cache:
+            self._proposal_cache[text] = self.model.encode(
+                text, normalize_embeddings=True
+            )
+        return self._proposal_cache[text]
+
+    def clear_proposal_cache(self) -> None:
+        """Call between independent matching runs to avoid stale cache entries."""
+        self._proposal_cache.clear()
+
     # ------------------------------------------------------------------ indexing
 
     def index_freelancer(self, user_id: int, profile: Dict[str, Any]) -> bool:
@@ -149,6 +171,45 @@ class BertMatchingService:
         except Exception:
             return False
 
+    def batch_index_freelancers(self, profiles: List[Dict[str, Any]]) -> int:
+        """
+        Encode multiple freelancer profiles in a single batch call and upsert
+        all vectors into Qdrant at once.  Far faster than calling index_freelancer
+        in a loop when many profiles need indexing simultaneously.
+        Returns the number of profiles successfully indexed.
+        """
+        self.initialize()
+        if not self.model or not self._qdrant or not profiles:
+            return 0
+        try:
+            from qdrant_client.models import PointStruct
+
+            texts = [self._freelancer_text(p) for p in profiles]
+            # Single encode call for all profiles — sentence-transformers
+            # handles batching internally and is dramatically faster than N
+            # individual encode() calls.
+            vectors = self.model.encode(texts, normalize_embeddings=True, batch_size=32)
+
+            points = [
+                PointStruct(
+                    id=p["user_id"],
+                    vector=vectors[i].tolist(),
+                    payload={
+                        "user_id":            p.get("user_id"),
+                        "skills":             p.get("skills") or [],
+                        "availability":       p.get("availability") or "",
+                        "hourly_rate":        p.get("hourly_rate"),
+                        "experience_level":   p.get("experience_level") or "",
+                        "freelance_category": p.get("freelance_category") or "",
+                    },
+                )
+                for i, p in enumerate(profiles)
+            ]
+            self._qdrant.upsert(collection_name=COLLECTION, points=points)
+            return len(points)
+        except Exception:
+            return 0
+
     # ------------------------------------------------------------------ ANN search
 
     def search_qdrant(self, proposal: Dict[str, Any], top_k: int = 20) -> List[Dict[str, Any]]:
@@ -157,9 +218,7 @@ class BertMatchingService:
         if not self.model or not self._qdrant:
             return []
         try:
-            query_vector = self.model.encode(
-                self._proposal_text(proposal), normalize_embeddings=True
-            ).tolist()
+            query_vector = self._encode_proposal_cached(proposal).tolist()
 
             hits = self._qdrant.query_points(
                 collection_name=COLLECTION,
@@ -217,20 +276,29 @@ class BertMatchingService:
     def _score_with_transformer(
         self, proposal: Dict[str, Any], freelancers: List[Dict[str, Any]]
     ) -> List[Dict[str, Any]]:
-        proposal_text = self._proposal_text(proposal)
         freelancer_texts = [self._freelancer_text(f) for f in freelancers]
 
-        proposal_vec = self.model.encode(proposal_text, normalize_embeddings=True)
-        freelancer_vecs = self.model.encode(freelancer_texts, normalize_embeddings=True)
+        # Use cached proposal vector — avoids re-encoding if search_qdrant already
+        # ran in the same pipeline call.
+        proposal_vec = self._encode_proposal_cached(proposal)
+
+        # Single batch encode for all freelancers.
+        freelancer_vecs = self.model.encode(
+            freelancer_texts, normalize_embeddings=True, batch_size=32
+        )
+
+        # Vectorized cosine similarity: since both sets of vectors are L2-normalized,
+        # cosine_sim(a, b) == dot(a, b).  One matrix multiply replaces N Python loops.
+        # Shape: (N,)
+        semantic_scores = (freelancer_vecs @ proposal_vec).tolist()
 
         results: List[Dict[str, Any]] = []
-        for freelancer, vec in zip(freelancers, freelancer_vecs):
-            semantic = float(self._cosine_similarity(proposal_vec, vec))
-            signals = self._multi_signal_score(proposal, freelancer, semantic_score=semantic)
+        for i, (freelancer, semantic) in enumerate(zip(freelancers, semantic_scores)):
+            signals = self._multi_signal_score(proposal, freelancer, semantic_score=float(semantic))
             results.append({
                 "user_id":          freelancer.get("user_id"),
                 "score":            round(signals["final"], 4),
-                "semantic_score":   round(semantic, 4),
+                "semantic_score":   round(float(semantic), 4),
                 "skill_f1":         round(signals["skill_f1"], 4),
                 "budget_compat":    round(signals["budget_compat"], 4),
                 "experience_fit":   round(signals["experience_fit"], 4),
@@ -238,8 +306,44 @@ class BertMatchingService:
                 "model_source":     "bert_mpnet_multisignal",
             })
 
+        # Auto-index any un-indexed freelancers so subsequent matching runs
+        # can use Qdrant ANN instead of repeating the BERT computation.
+        self._auto_index(freelancers, freelancer_vecs)
+
         results.sort(key=lambda x: x["score"], reverse=True)
         return results
+
+    def _auto_index(self, freelancers: List[Dict[str, Any]], vecs: "np.ndarray") -> None:
+        """
+        Silently upsert computed vectors into Qdrant so Stage 2 freelancers
+        become Stage 1 candidates on the next matching run.
+        Skips any profile that already has a valid user_id.
+        """
+        if not self._qdrant:
+            return
+        try:
+            from qdrant_client.models import PointStruct
+            points = []
+            for profile, vec in zip(freelancers, vecs):
+                uid = profile.get("user_id")
+                if uid is None:
+                    continue
+                points.append(PointStruct(
+                    id=uid,
+                    vector=vec.tolist(),
+                    payload={
+                        "user_id":            uid,
+                        "skills":             profile.get("skills") or [],
+                        "availability":       profile.get("availability") or "",
+                        "hourly_rate":        profile.get("hourly_rate"),
+                        "experience_level":   profile.get("experience_level") or "",
+                        "freelance_category": profile.get("freelance_category") or "",
+                    },
+                ))
+            if points:
+                self._qdrant.upsert(collection_name=COLLECTION, points=points)
+        except Exception:
+            pass  # indexing failure must never break scoring
 
     def _score_with_overlap(
         self, proposal: Dict[str, Any], freelancers: List[Dict[str, Any]]
@@ -458,14 +562,15 @@ class BertMatchingService:
         return re.findall(r"[a-zA-Z0-9\+\#\.]+", text.lower())
 
     def _cosine_similarity(self, a: Any, b: Any) -> float:
-        dot = norm_a = norm_b = 0.0
-        for ai, bi in zip(a, b):
-            dot   += float(ai) * float(bi)
-            norm_a += float(ai) * float(ai)
-            norm_b += float(bi) * float(bi)
-        if norm_a == 0 or norm_b == 0:
-            return 0.0
-        return dot / (math.sqrt(norm_a) * math.sqrt(norm_b))
+        """
+        Cosine similarity via numpy dot product.
+        Vectors from sentence-transformers with normalize_embeddings=True are
+        already L2-normalized, so cosine_sim(a, b) == dot(a, b).
+        Kept for any callers outside _score_with_transformer.
+        """
+        a, b = np.asarray(a, dtype=np.float32), np.asarray(b, dtype=np.float32)
+        denom = np.linalg.norm(a) * np.linalg.norm(b)
+        return float(np.dot(a, b) / denom) if denom > 0 else 0.0
 
     def _infer_seniority(self, text: str) -> int:
         """Return numeric seniority inferred from text, or -1 if none found."""

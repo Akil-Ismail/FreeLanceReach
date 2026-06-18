@@ -65,6 +65,9 @@ class RerankRequest(BaseModel):
 @router.post("/rerank")
 async def rerank_freelancers(request: RerankRequest) -> Dict[str, Any]:
     service = get_bert_matching_service()
+    # Clear proposal cache at the top of each pipeline entry point so stale
+    # vectors from a previous proposal never bleed into the current run.
+    service.clear_proposal_cache()
     matches = service.rerank(
         proposal=request.proposal.model_dump(),
         freelancers=[f.model_dump() for f in request.freelancers],
@@ -79,6 +82,8 @@ async def rerank_freelancers(request: RerankRequest) -> Dict[str, Any]:
 @router.post("/bert-score")
 async def bert_score(request: MatchingRequest) -> Dict[str, Any]:
     service = get_bert_matching_service()
+    # Clear proposal cache so this independent scoring call gets a fresh encode.
+    service.clear_proposal_cache()
     matches = service.score_matches(
         proposal=request.proposal.model_dump(),
         freelancers=[f.model_dump() for f in request.freelancers],
@@ -124,5 +129,5 @@ async def matching_health() -> Dict[str, Any]:
         "transformer_available": service.is_transformer_available(),
         "qdrant_available": service.is_qdrant_available(),
         "qdrant_indexed_count": service.qdrant_count(),
-        "model": "sentence-transformers/all-MiniLM-L6-v2",
+        "model": "sentence-transformers/all-mpnet-base-v2",
     }

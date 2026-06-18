@@ -318,10 +318,10 @@ export default function HomeMeetingPage() {
         ) : (
           <>
             {/* ── Active meetings ── */}
-            {meetings.filter(m => !isPast(m)).length > 0 && (
+            {meetings.filter(m => !(isPast(m) && m.status === "approved")).length > 0 && (
               <div className="space-y-3">
                 <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Scheduled Meetings</h2>
-                {meetings.filter(m => !isPast(m)).map((meeting) => {
+                {meetings.filter(m => !(isPast(m) && m.status === "approved")).map((meeting) => {
                   const meta = STATUS_STYLE[meeting.status] || "bg-gray-100 text-gray-500";
                   return (
                     <div key={meeting.id} className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:border-gray-300 transition">

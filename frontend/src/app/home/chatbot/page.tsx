@@ -409,6 +409,8 @@ export default function HomeChatbotPage() {
 
   const handlePostProposal = async (draft: ProposalDraft) => {
     await api.post("/proposals", omitEmpty({
+      actor_user_id: Number(userId),
+      company_user_id: Number(userId),
       title: draft.title,
       description: draft.description,
       required_skills: draft.required_skills,
@@ -526,15 +528,17 @@ export default function HomeChatbotPage() {
                 <p className="text-xs text-gray-400 mt-1">Choose an option to get started</p>
               </div>
               <div className="flex flex-col sm:flex-row gap-3">
-                <button
-                  onClick={() => {
-                    setMode("proposal");
-                    setChat([{ role: "assistant", content: "Great! Let's craft a compelling job proposal. What kind of role or project are you looking to post?" }]);
-                  }}
-                  className="px-5 py-3 rounded-xl border-2 border-red-200 bg-red-50 hover:bg-red-100 hover:border-red-400 transition-all text-sm font-medium text-red-700 text-left"
-                >
-                  📋 Help me write a job proposal
-                </button>
+                {userRole === "company" && (
+                  <button
+                    onClick={() => {
+                      setMode("proposal");
+                      setChat([{ role: "assistant", content: "Great! Let's craft a compelling job proposal. What kind of role or project are you looking to post?" }]);
+                    }}
+                    className="px-5 py-3 rounded-xl border-2 border-red-200 bg-red-50 hover:bg-red-100 hover:border-red-400 transition-all text-sm font-medium text-red-700 text-left"
+                  >
+                    📋 Help me write a job proposal
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     setMode("profile");
