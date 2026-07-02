@@ -1,12 +1,12 @@
 """
-AI Proposal Generator Router - Generates freelancer job applications using Gemini.
+AI Proposal Generator Router - Generates freelancer job applications using Groq.
 """
 
 from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import Optional, List
 
-from app.services.gemini_service import get_gemini_service
+from app.services.groq_service import get_groq_service
 
 router = APIRouter()
 
@@ -60,7 +60,7 @@ async def generate_proposal(request: ProposalGeneratorRequest):
     Accepts a job description + optional freelancer profile and returns
     a tailored, professional cover letter / proposal text.
     """
-    gemini = get_gemini_service()
+    groq = get_groq_service()
 
     profile = request.freelancer_profile or FreelancerProfile()
     skills_str = ", ".join(profile.skills or request.required_skills or [])
@@ -93,14 +93,14 @@ FREELANCER PROFILE:
 Generate a compelling, personalised proposal (200-350 words) written from the freelancer's perspective.
 """
 
-    if gemini.is_available():
-        proposal_text = await gemini.chat(
+    if groq.is_available():
+        proposal_text = await groq.chat(
             message=prompt,
             system_prompt=PROPOSAL_SYSTEM_PROMPT,
         )
         return ProposalGeneratorResponse(proposal_text=proposal_text, success=True, fallback=False)
 
-    # Fallback template when Gemini is unavailable
+    # Fallback template when Groq is unavailable
     name = profile.name or "I"
     headline = profile.headline or "an experienced freelancer"
     skills_display = skills_str or "the required technologies"
@@ -120,9 +120,9 @@ Generate a compelling, personalised proposal (200-350 words) written from the fr
 
 @router.get("/health")
 async def proposal_generator_health():
-    gemini = get_gemini_service()
+    groq = get_groq_service()
     return {
         "service": "proposal_generator",
-        "available": gemini.is_available(),
+        "available": groq.is_available(),
         "purpose": "AI-powered freelance proposal generation",
     }

@@ -8,7 +8,7 @@ from fastapi import APIRouter, Header
 from pydantic import BaseModel
 from typing import Optional, List
 
-from app.services.gemini_service import get_gemini_service
+from app.services.groq_service import get_groq_service
 
 router = APIRouter()
 
@@ -88,7 +88,7 @@ async def freelancer_chat(
     request: FreelancerChatRequest,
     authorization: Optional[str] = Header(None),
 ):
-    groq = get_gemini_service()
+    groq = get_groq_service()
 
     token = authorization.removeprefix("Bearer ").strip() if authorization else ""
     profile = await _fetch_profile(token) if token else None
@@ -181,7 +181,7 @@ class ExtractProfileResponse(BaseModel):
 @router.post("/extract-profile", response_model=ExtractProfileResponse)
 async def extract_profile(request: ExtractProfileRequest):
     """Parse chat history and extract structured freelancer profile fields."""
-    groq = get_gemini_service()
+    groq = get_groq_service()
 
     history_text = "\n".join(
         f"{'User' if m.role == 'user' else 'Assistant'}: {m.content}"
@@ -234,7 +234,7 @@ Rules:
 
 @router.get("/health")
 async def freelancer_chat_health():
-    groq = get_gemini_service()
+    groq = get_groq_service()
     return {
         "service": "freelancer_chat",
         "available": groq.is_available(),

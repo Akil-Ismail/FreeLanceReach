@@ -8,7 +8,7 @@ from fastapi import APIRouter, Header
 from pydantic import BaseModel
 from typing import Optional, List
 
-from app.services.gemini_service import get_gemini_service
+from app.services.groq_service import get_groq_service
 
 router = APIRouter()
 
@@ -127,7 +127,7 @@ async def company_chat(
     request: CompanyChatRequest,
     authorization: Optional[str] = Header(None),
 ):
-    groq = get_gemini_service()
+    groq = get_groq_service()
 
     token = authorization.removeprefix("Bearer ").strip() if authorization else ""
     profile = await _fetch_profile(token) if token else None
@@ -178,7 +178,7 @@ async def extract_proposal(request: ExtractProposalRequest):
     """
     Parse the chat history and extract a structured job proposal ready to post.
     """
-    groq = get_gemini_service()
+    groq = get_groq_service()
 
     history_text = "\n".join(
         f"{'User' if m.role == 'user' else 'Assistant'}: {m.content}"
@@ -243,7 +243,7 @@ class ExtractCompanyProfileResponse(BaseModel):
 @router.post("/extract-profile", response_model=ExtractCompanyProfileResponse)
 async def extract_company_profile(request: ExtractCompanyProfileRequest):
     """Parse chat history and extract structured company profile fields."""
-    groq = get_gemini_service()
+    groq = get_groq_service()
 
     history_text = "\n".join(
         f"{'User' if m.role == 'user' else 'Assistant'}: {m.content}"
@@ -290,7 +290,7 @@ Rules:
 
 @router.get("/health")
 async def company_chat_health():
-    groq = get_gemini_service()
+    groq = get_groq_service()
     return {
         "service": "company_chat",
         "available": groq.is_available(),
@@ -300,7 +300,7 @@ async def company_chat_health():
 
 @router.post("/contract-draft", response_model=ContractDraftResponse)
 async def company_contract_draft(request: ContractDraftRequest):
-    groq = get_gemini_service()
+    groq = get_groq_service()
     details_text = "\n".join([f"- {k}: {v}" for k, v in request.details.items()])
 
     if groq.is_available():

@@ -15,8 +15,8 @@ load_dotenv(dotenv_path=ENV_PATH, override=True)
 MODEL = "llama-3.3-70b-versatile"
 
 
-class GeminiService:
-    """Service for interacting with Groq AI (drop-in replacement for Gemini)"""
+class GroqService:
+    """Service for interacting with Groq AI (drop-in replacement for Groq)"""
 
     def __init__(self):
         raw_key = os.getenv("GROQ_API_KEY") or ""
@@ -76,12 +76,12 @@ class GeminiService:
 
 
 # Singleton instance
-_gemini_service: Optional[GeminiService] = None
+_groq_service: Optional[GroqService] = None
 
 
-def get_gemini_service() -> GeminiService:
-    global _gemini_service
-    if _gemini_service is None:
-        _gemini_service = GeminiService()
-        _gemini_service.initialize()
-    return _gemini_service
+def get_groq_service() -> GroqService:
+    global _groq_service
+    if _groq_service is None:
+        _groq_service = GroqService()
+        _groq_service.initialize()
+    return _groq_service

@@ -43,6 +43,7 @@ Built as a graduate thesis project at the Lebanese International University, Fre
 ## Features
 
 ### For Companies
+
 - **Smart Freelancer Matching** — BERT-powered semantic matching ranks freelancers by relevance to your job description
 - **AI Job Proposals** — Generate and manage job proposals with AI-assisted content
 - **Contract Management** — Create, send, and e-sign contracts within the platform
@@ -53,6 +54,7 @@ Built as a graduate thesis project at the Lebanese International University, Fre
 - **Approval Workflows** — Structured approval flow for meetings and contracts
 
 ### For Freelancers
+
 - **AI Proposal Generator** — One-click AI-generated proposals tailored to job requirements
 - **Job Discovery** — Browse and filter available jobs matched to your profile
 - **Smart Matching Score** — See how well you match each company's needs
@@ -63,6 +65,7 @@ Built as a graduate thesis project at the Lebanese International University, Fre
 - **Profile Builder** — AI-enhanced profile setup with skills and bio optimization
 
 ### Platform-wide
+
 - **Role-based Access Control** — Separate dashboards and permissions for companies and freelancers
 - **Google OAuth** — Sign in with Google for both user types
 - **Responsive Design** — Mobile-first UI that works on any screen size
@@ -282,49 +285,52 @@ Built as a graduate thesis project at the Lebanese International University, Fre
 
 ### Service Communication
 
-| Service | URL | Purpose |
-|---|---|---|
-| Frontend | `http://localhost:3000` | Next.js UI |
-| Laravel API | `http://localhost:8000` | User, contracts, tasks |
-| FastAPI AI | `http://localhost:8001` | Matching, proposals, chat |
-| MySQL | `localhost:3306` | Relational data |
-| Qdrant | `localhost:6333` | Vector embeddings |
+| Service     | URL                     | Purpose                   |
+| ----------- | ----------------------- | ------------------------- |
+| Frontend    | `http://localhost:3000` | Next.js UI                |
+| Laravel API | `http://localhost:8000` | User, contracts, tasks    |
+| FastAPI AI  | `http://localhost:8001` | Matching, proposals, chat |
+| MySQL       | `localhost:3306`        | Relational data           |
+| Qdrant      | `localhost:6333`        | Vector embeddings         |
 
 ---
 
 ## Tech Stack
 
 ### Frontend
-| Technology | Version | Purpose |
-|---|---|---|
-| Next.js | 15.5.2 | React framework with App Router |
-| React | 19.1.0 | UI library |
-| TypeScript | 5.0 | Type safety |
-| Tailwind CSS | v4 | Utility-first styling |
-| Radix UI | Latest | Accessible component primitives |
-| Lucide React | 0.542 | Icon library |
-| Axios | 1.13 | HTTP client |
-| Google OAuth | 0.13 | Social authentication |
+
+| Technology   | Version | Purpose                         |
+| ------------ | ------- | ------------------------------- |
+| Next.js      | 15.5.2  | React framework with App Router |
+| React        | 19.1.0  | UI library                      |
+| TypeScript   | 5.0     | Type safety                     |
+| Tailwind CSS | v4      | Utility-first styling           |
+| Radix UI     | Latest  | Accessible component primitives |
+| Lucide React | 0.542   | Icon library                    |
+| Axios        | 1.13    | HTTP client                     |
+| Google OAuth | 0.13    | Social authentication           |
 
 ### Backend — Laravel
-| Technology | Version | Purpose |
-|---|---|---|
-| Laravel | 8.0 | PHP REST API framework |
-| PHP | 8.0+ | Server-side language |
-| MySQL | 8.0 | Primary relational database |
-| XAMPP | Latest | Local dev server (Apache + MySQL) |
-| Laravel CORS | Latest | Cross-origin resource sharing |
+
+| Technology   | Version | Purpose                           |
+| ------------ | ------- | --------------------------------- |
+| Laravel      | 8.0     | PHP REST API framework            |
+| PHP          | 8.0+    | Server-side language              |
+| MySQL        | 8.0     | Primary relational database       |
+| XAMPP        | Latest  | Local dev server (Apache + MySQL) |
+| Laravel CORS | Latest  | Cross-origin resource sharing     |
 
 ### Backend — FastAPI (AI Service)
-| Technology | Version | Purpose |
-|---|---|---|
-| FastAPI | 0.109+ | High-performance Python API |
-| Python | 3.11+ | AI/ML processing language |
-| Sentence Transformers | 2.3+ | BERT-based semantic embeddings |
-| Qdrant | 1.17+ | Vector database for similarity search |
-| Groq AI | 1.4+ | LLM-powered chat and proposals |
-| Pydantic | 2.6+ | Data validation |
-| Uvicorn | 0.27+ | ASGI server |
+
+| Technology            | Version | Purpose                               |
+| --------------------- | ------- | ------------------------------------- |
+| FastAPI               | 0.109+  | High-performance Python API           |
+| Python                | 3.11+   | AI/ML processing language             |
+| Sentence Transformers | 2.3+    | BERT-based semantic embeddings        |
+| Qdrant                | 1.17+   | Vector database for similarity search |
+| Groq AI               | 1.4+    | LLM-powered chat and proposals        |
+| Pydantic              | 2.6+    | Data validation                       |
+| Uvicorn               | 0.27+   | ASGI server                           |
 
 ---
 
@@ -388,9 +394,9 @@ The Laravel API will be available at `http://localhost:8000`
 
 **Test Credentials (after seeding):**
 
-| Role | Email | Password |
-|---|---|---|
-| Company | company@test.com | password123 |
+| Role       | Email               | Password    |
+| ---------- | ------------------- | ----------- |
+| Company    | company@test.com    | password123 |
 | Freelancer | freelancer@test.com | password123 |
 
 ---
@@ -423,6 +429,7 @@ uvicorn main:app --host 0.0.0.0 --port 8001 --reload
 The AI service will be available at `http://localhost:8001`
 
 **Qdrant (Vector Database) — Docker:**
+
 ```bash
 docker pull qdrant/qdrant
 docker run -p 6333:6333 qdrant/qdrant
@@ -453,6 +460,7 @@ The frontend will be available at `http://localhost:3000`
 ### Environment Variables
 
 **Frontend** (`frontend/.env.local`):
+
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8000/api
 NEXT_PUBLIC_FASTAPI_URL=http://localhost:8001/api
@@ -460,6 +468,7 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id_here
 ```
 
 **FastAPI** (`backend/FastAPI/.env`):
+
 ```env
 DEBUG=True
 API_HOST=0.0.0.0
@@ -469,6 +478,7 @@ LARAVEL_URL=http://127.0.0.1:8000/api
 ```
 
 **Laravel** (`backend/laravel/my-laravel-app/.env`):
+
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -484,6 +494,7 @@ DB_PASSWORD=
 ### Laravel REST API (`http://localhost:8000/api`)
 
 #### User Management
+
 ```
 POST   /api/register/company       Register a company account
 POST   /api/register/freelancer    Register a freelancer account
@@ -495,6 +506,7 @@ DELETE /api/users/{id}             Delete user
 ```
 
 #### Platform Operations
+
 ```
 GET/POST  /api/contracts           Contract management
 GET/POST  /api/tasks               Task board operations
@@ -509,18 +521,21 @@ GET/POST  /api/chat                Chat messages
 ### FastAPI AI Service (`http://localhost:8001/api`)
 
 #### Health
+
 ```
 GET  /api/health      Service health check
 GET  /api/health/db   Qdrant database health
 ```
 
 #### Matching
+
 ```
 POST  /api/matching/match-freelancers   Match freelancers to a job description
 POST  /api/matching/match-jobs          Match jobs to a freelancer profile
 ```
 
 #### Proposal Generator
+
 ```
 POST  /api/proposal-generator/generate    Generate AI proposal
 POST  /api/proposal-generator/cache       Cache a proposal
@@ -528,12 +543,14 @@ GET   /api/proposal-generator/cached      Retrieve cached proposals
 ```
 
 #### AI Chat
+
 ```
 POST  /api/company-chat/message       Company AI assistant
 POST  /api/freelancer-chat/message    Freelancer AI assistant
 ```
 
 #### Vector Operations
+
 ```
 GET   /api/vectors/collections       List vector collections
 POST  /api/vectors/documents         Store a document embedding
@@ -542,6 +559,7 @@ POST  /api/vectors/reset             Reset vector database
 ```
 
 #### Evaluation
+
 ```
 POST  /api/evaluation/evaluate       Evaluate matching performance
 GET   /api/evaluation/metrics        Retrieve evaluation metrics
@@ -581,7 +599,7 @@ freelance-reach/
 │   │   │   ├── services/        # Business logic
 │   │   │   │   ├── bert_matching_service.py
 │   │   │   │   ├── vector_service.py
-│   │   │   │   └── gemini_service.py
+│   │   │   │   └── groq_service.py
 │   │   │   └── models/          # Pydantic schemas
 │   │   ├── main.py              # FastAPI entry point
 │   │   └── requirements.txt
@@ -610,12 +628,14 @@ freelance-reach/
 ## Running Tests
 
 ### Laravel
+
 ```bash
 cd backend/laravel/my-laravel-app
 php artisan test
 ```
 
 The test suite covers:
+
 - Company registration
 - Freelancer registration
 - User listing and filtering
@@ -623,6 +643,7 @@ The test suite covers:
 - Role-based queries
 
 ### FastAPI
+
 ```bash
 cd backend/FastAPI
 pytest
@@ -674,6 +695,6 @@ Lebanese International University · Graduate Thesis Project
 
 <br/>
 
-*Built with passion, powered by AI.*
+_Built with passion, powered by AI._
 
 </div>

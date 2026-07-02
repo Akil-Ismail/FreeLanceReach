@@ -12,14 +12,26 @@
       "proposal": {
         "title": "Senior React Developer for E-Commerce Platform",
         "description": "We need an experienced React developer to build a scalable e-commerce front-end. The project involves creating reusable component libraries, integrating REST APIs, implementing cart and checkout flows, and ensuring mobile responsiveness.",
-        "required_skills": ["React", "TypeScript", "REST API", "TailwindCSS", "Git"]
+        "required_skills": [
+          "React",
+          "TypeScript",
+          "REST API",
+          "TailwindCSS",
+          "Git"
+        ]
       },
       "candidates": [
         {
           "user_id": 101,
           "headline": "Full-Stack React & Node.js Developer",
           "bio": "5 years building React applications for e-commerce and SaaS platforms. Expert in TypeScript, Redux, and REST API integration.",
-          "skills": ["React", "TypeScript", "Node.js", "REST API", "TailwindCSS"],
+          "skills": [
+            "React",
+            "TypeScript",
+            "Node.js",
+            "REST API",
+            "TailwindCSS"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -35,7 +47,14 @@
           "user_id": 103,
           "headline": "React & Next.js Expert",
           "bio": "Senior developer with deep React, Next.js, and TypeScript skills. Built multiple high-traffic e-commerce frontends.",
-          "skills": ["React", "Next.js", "TypeScript", "TailwindCSS", "REST API", "Git"],
+          "skills": [
+            "React",
+            "Next.js",
+            "TypeScript",
+            "TailwindCSS",
+            "REST API",
+            "Git"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -70,7 +89,15 @@
           "user_id": 201,
           "headline": "NLP Engineer — BERT & Transformers Specialist",
           "bio": "4 years of NLP research and engineering. Published work on text classification using BERT fine-tuning. Deployed models as FastAPI microservices.",
-          "skills": ["Python", "NLP", "BERT", "Transformers", "scikit-learn", "FastAPI", "PyTorch"],
+          "skills": [
+            "Python",
+            "NLP",
+            "BERT",
+            "Transformers",
+            "scikit-learn",
+            "FastAPI",
+            "PyTorch"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -94,7 +121,15 @@
           "user_id": 204,
           "headline": "Machine Learning Engineer — Deep Learning & NLP",
           "bio": "3 years building ML pipelines for text and vision tasks. Expert in Hugging Face Transformers and deploying models with FastAPI.",
-          "skills": ["Python", "NLP", "BERT", "PyTorch", "FastAPI", "scikit-learn", "Docker"],
+          "skills": [
+            "Python",
+            "NLP",
+            "BERT",
+            "PyTorch",
+            "FastAPI",
+            "scikit-learn",
+            "Docker"
+          ],
           "experience_level": "mid",
           "label": 1
         },
@@ -114,14 +149,27 @@
       "proposal": {
         "title": "Mobile App Developer — React Native iOS & Android",
         "description": "Develop a cross-platform mobile application for a healthcare startup. The app needs push notifications, offline support, integration with REST APIs, and a clean UI following Material Design principles.",
-        "required_skills": ["React Native", "JavaScript", "TypeScript", "REST API", "Push Notifications"]
+        "required_skills": [
+          "React Native",
+          "JavaScript",
+          "TypeScript",
+          "REST API",
+          "Push Notifications"
+        ]
       },
       "candidates": [
         {
           "user_id": 301,
           "headline": "React Native Developer — Cross-Platform Mobile",
           "bio": "4 years of React Native development. Shipped apps to App Store and Play Store. Expert in push notifications and offline-first architecture.",
-          "skills": ["React Native", "JavaScript", "TypeScript", "REST API", "Push Notifications", "Redux"],
+          "skills": [
+            "React Native",
+            "JavaScript",
+            "TypeScript",
+            "REST API",
+            "Push Notifications",
+            "Redux"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -145,7 +193,13 @@
           "user_id": 304,
           "headline": "React Native & TypeScript Expert",
           "bio": "3 years building healthcare and fintech mobile apps in React Native. Strong TypeScript and API integration skills.",
-          "skills": ["React Native", "TypeScript", "REST API", "Push Notifications", "JavaScript"],
+          "skills": [
+            "React Native",
+            "TypeScript",
+            "REST API",
+            "Push Notifications",
+            "JavaScript"
+          ],
           "experience_level": "mid",
           "label": 1
         },
@@ -165,14 +219,27 @@
       "proposal": {
         "title": "UI/UX Designer — SaaS Dashboard Redesign",
         "description": "Complete redesign of our analytics dashboard. Need wireframes, high-fidelity prototypes in Figma, user research, and design system creation. The designer will work closely with the engineering team.",
-        "required_skills": ["Figma", "UI Design", "UX Design", "Design Systems", "Prototyping"]
+        "required_skills": [
+          "Figma",
+          "UI Design",
+          "UX Design",
+          "Design Systems",
+          "Prototyping"
+        ]
       },
       "candidates": [
         {
           "user_id": 401,
           "headline": "Senior UI/UX Designer — SaaS Products",
           "bio": "6 years designing SaaS dashboards and analytics tools. Expert Figma user, created multiple design systems. Conduct user research and A/B testing.",
-          "skills": ["Figma", "UI Design", "UX Design", "Design Systems", "Prototyping", "User Research"],
+          "skills": [
+            "Figma",
+            "UI Design",
+            "UX Design",
+            "Design Systems",
+            "Prototyping",
+            "User Research"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -188,7 +255,13 @@
           "user_id": 403,
           "headline": "Product Designer — Figma & Design Systems",
           "bio": "4 years of product design for B2B SaaS. Built Figma component libraries and design tokens from scratch.",
-          "skills": ["Figma", "UI Design", "Design Systems", "Prototyping", "User Research"],
+          "skills": [
+            "Figma",
+            "UI Design",
+            "Design Systems",
+            "Prototyping",
+            "User Research"
+          ],
           "experience_level": "mid",
           "label": 1
         },
@@ -223,7 +296,15 @@
           "user_id": 501,
           "headline": "Senior DevOps Engineer — AWS & Kubernetes",
           "bio": "7 years of cloud infrastructure. AWS Solutions Architect certified. Expert in Kubernetes, Terraform, and CI/CD pipelines.",
-          "skills": ["AWS", "Kubernetes", "Docker", "Terraform", "CI/CD", "Prometheus", "Grafana"],
+          "skills": [
+            "AWS",
+            "Kubernetes",
+            "Docker",
+            "Terraform",
+            "CI/CD",
+            "Prometheus",
+            "Grafana"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -247,7 +328,14 @@
           "user_id": 504,
           "headline": "DevOps & Platform Engineer",
           "bio": "5 years of DevOps. Specialises in AWS, Terraform infrastructure-as-code, Docker and Kubernetes deployments.",
-          "skills": ["AWS", "Terraform", "Docker", "Kubernetes", "CI/CD", "Linux"],
+          "skills": [
+            "AWS",
+            "Terraform",
+            "Docker",
+            "Kubernetes",
+            "CI/CD",
+            "Linux"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -267,14 +355,27 @@
       "proposal": {
         "title": "Laravel PHP Backend Developer — API Development",
         "description": "Build RESTful APIs for a multi-tenant SaaS platform. Responsibilities include database design, authentication with Laravel Sanctum, role-based access control, and integration with third-party services.",
-        "required_skills": ["Laravel", "PHP", "MySQL", "REST API", "Authentication"]
+        "required_skills": [
+          "Laravel",
+          "PHP",
+          "MySQL",
+          "REST API",
+          "Authentication"
+        ]
       },
       "candidates": [
         {
           "user_id": 601,
           "headline": "Senior Laravel Developer",
           "bio": "6 years PHP and Laravel experience. Built large-scale multi-tenant SaaS APIs with Sanctum auth and complex RBAC systems.",
-          "skills": ["Laravel", "PHP", "MySQL", "REST API", "Authentication", "Docker"],
+          "skills": [
+            "Laravel",
+            "PHP",
+            "MySQL",
+            "REST API",
+            "Authentication",
+            "Docker"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -325,7 +426,15 @@
           "user_id": 701,
           "headline": "Senior Data Engineer — AWS & Airflow",
           "bio": "5 years of data engineering. Built ETL pipelines with Airflow and dbt on AWS Redshift. Expert in data warehousing.",
-          "skills": ["Python", "SQL", "AWS", "Airflow", "dbt", "ETL", "Redshift"],
+          "skills": [
+            "Python",
+            "SQL",
+            "AWS",
+            "Airflow",
+            "dbt",
+            "ETL",
+            "Redshift"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -369,14 +478,27 @@
       "proposal": {
         "title": "Blockchain Developer — Solidity Smart Contracts",
         "description": "Develop and audit smart contracts on Ethereum for a DeFi protocol. Must understand ERC-20/721 standards, gas optimisation, and security best practices. Experience with Hardhat and OpenZeppelin required.",
-        "required_skills": ["Solidity", "Ethereum", "Web3", "Hardhat", "Smart Contracts"]
+        "required_skills": [
+          "Solidity",
+          "Ethereum",
+          "Web3",
+          "Hardhat",
+          "Smart Contracts"
+        ]
       },
       "candidates": [
         {
           "user_id": 801,
           "headline": "Blockchain Developer — Solidity & DeFi",
           "bio": "4 years of smart contract development on Ethereum. Audited multiple DeFi protocols. Expert in ERC standards and gas optimisation with Hardhat.",
-          "skills": ["Solidity", "Ethereum", "Web3", "Hardhat", "OpenZeppelin", "Smart Contracts"],
+          "skills": [
+            "Solidity",
+            "Ethereum",
+            "Web3",
+            "Hardhat",
+            "OpenZeppelin",
+            "Smart Contracts"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -420,14 +542,28 @@
       "proposal": {
         "title": "Technical Content Writer — Developer Documentation",
         "description": "Write clear, accurate technical documentation for REST APIs, SDKs, and developer guides. Must understand software concepts well enough to explain them to developers and produce code samples.",
-        "required_skills": ["Technical Writing", "REST API", "Markdown", "Documentation", "Git"]
+        "required_skills": [
+          "Technical Writing",
+          "REST API",
+          "Markdown",
+          "Documentation",
+          "Git"
+        ]
       },
       "candidates": [
         {
           "user_id": 901,
           "headline": "Technical Writer — API & SDK Documentation",
           "bio": "5 years writing developer docs for REST APIs, SDKs, and CLI tools. Produce code samples in Python, JavaScript, and cURL.",
-          "skills": ["Technical Writing", "REST API", "Markdown", "Documentation", "Git", "Python", "JavaScript"],
+          "skills": [
+            "Technical Writing",
+            "REST API",
+            "Markdown",
+            "Documentation",
+            "Git",
+            "Python",
+            "JavaScript"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -443,7 +579,13 @@
           "user_id": 903,
           "headline": "Developer Advocate & Technical Writer",
           "bio": "3 years as developer advocate. Write API documentation, tutorials, and code samples.",
-          "skills": ["Technical Writing", "REST API", "Documentation", "Markdown", "Git"],
+          "skills": [
+            "Technical Writing",
+            "REST API",
+            "Documentation",
+            "Markdown",
+            "Git"
+          ],
           "experience_level": "mid",
           "label": 1
         },
@@ -471,14 +613,27 @@
       "proposal": {
         "title": "Cybersecurity Analyst — Penetration Testing",
         "description": "Conduct penetration tests on web applications and APIs. Produce detailed vulnerability reports with CVSS scores and remediation recommendations. Must be familiar with OWASP Top 10.",
-        "required_skills": ["Penetration Testing", "OWASP", "Cybersecurity", "Burp Suite", "Python"]
+        "required_skills": [
+          "Penetration Testing",
+          "OWASP",
+          "Cybersecurity",
+          "Burp Suite",
+          "Python"
+        ]
       },
       "candidates": [
         {
           "user_id": 1001,
           "headline": "Penetration Tester — Web & API Security",
           "bio": "5 years offensive security. CEH certified. Conduct web app and API penetration tests, write CVSS-scored reports using OWASP methodology.",
-          "skills": ["Penetration Testing", "OWASP", "Cybersecurity", "Burp Suite", "Python", "Metasploit"],
+          "skills": [
+            "Penetration Testing",
+            "OWASP",
+            "Cybersecurity",
+            "Burp Suite",
+            "Python",
+            "Metasploit"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -494,7 +649,13 @@
           "user_id": 1003,
           "headline": "Security Researcher & Ethical Hacker",
           "bio": "3 years of web application security research. Found and reported OWASP Top 10 vulnerabilities in bug bounty programs.",
-          "skills": ["Cybersecurity", "OWASP", "Penetration Testing", "Burp Suite", "Python"],
+          "skills": [
+            "Cybersecurity",
+            "OWASP",
+            "Penetration Testing",
+            "Burp Suite",
+            "Python"
+          ],
           "experience_level": "mid",
           "label": 1
         },
@@ -522,14 +683,26 @@
       "proposal": {
         "title": "Video Editor — YouTube & Social Media Content",
         "description": "Edit raw footage into engaging YouTube videos and short-form social media content. Must be proficient in colour grading, motion graphics, and audio mixing.",
-        "required_skills": ["Video Editing", "Premiere Pro", "After Effects", "Colour Grading", "Motion Graphics"]
+        "required_skills": [
+          "Video Editing",
+          "Premiere Pro",
+          "After Effects",
+          "Colour Grading",
+          "Motion Graphics"
+        ]
       },
       "candidates": [
         {
           "user_id": 1101,
           "headline": "Professional Video Editor — YouTube & Ads",
           "bio": "5 years editing YouTube channels with 500K+ subscribers. Expert in Premiere Pro, After Effects, and motion graphics.",
-          "skills": ["Video Editing", "Premiere Pro", "After Effects", "Colour Grading", "Motion Graphics"],
+          "skills": [
+            "Video Editing",
+            "Premiere Pro",
+            "After Effects",
+            "Colour Grading",
+            "Motion Graphics"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -545,7 +718,13 @@
           "user_id": 1103,
           "headline": "Video Editor & Motion Designer",
           "bio": "3 years editing social media and YouTube content. After Effects motion graphics and DaVinci colour grading.",
-          "skills": ["Video Editing", "After Effects", "Premiere Pro", "Colour Grading", "DaVinci Resolve"],
+          "skills": [
+            "Video Editing",
+            "After Effects",
+            "Premiere Pro",
+            "Colour Grading",
+            "DaVinci Resolve"
+          ],
           "experience_level": "mid",
           "label": 1
         },
@@ -572,15 +751,30 @@
       "split": "train",
       "proposal": {
         "title": "Python FastAPI Backend — AI Microservice Integration",
-        "description": "Build a Python FastAPI microservice that integrates with OpenAI and Gemini APIs, implements vector search with Qdrant, and exposes REST endpoints consumed by a Laravel backend.",
-        "required_skills": ["Python", "FastAPI", "LLM", "Qdrant", "REST API", "Docker"]
+        "description": "Build a Python FastAPI microservice that integrates with OpenAI and Groq APIs, implements vector search with Qdrant, and exposes REST endpoints consumed by a Laravel backend.",
+        "required_skills": [
+          "Python",
+          "FastAPI",
+          "LLM",
+          "Qdrant",
+          "REST API",
+          "Docker"
+        ]
       },
       "candidates": [
         {
           "user_id": 1201,
           "headline": "Python AI Engineer — FastAPI & LLM Integration",
-          "bio": "4 years building AI microservices with FastAPI. Integrated GPT-4, Gemini, and vector DBs including Qdrant. Deployed with Docker.",
-          "skills": ["Python", "FastAPI", "LLM", "Qdrant", "REST API", "Docker", "OpenAI"],
+          "bio": "4 years building AI microservices with FastAPI. Integrated GPT-4, Groq, and vector DBs including Qdrant. Deployed with Docker.",
+          "skills": [
+            "Python",
+            "FastAPI",
+            "LLM",
+            "Qdrant",
+            "REST API",
+            "Docker",
+            "OpenAI"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -596,7 +790,14 @@
           "user_id": 1203,
           "headline": "ML Engineer — Python & Model Deployment",
           "bio": "Machine learning engineer with FastAPI deployment experience. Familiar with LLM APIs and vector search.",
-          "skills": ["Python", "FastAPI", "Machine Learning", "LLM", "Docker", "REST API"],
+          "skills": [
+            "Python",
+            "FastAPI",
+            "Machine Learning",
+            "LLM",
+            "Docker",
+            "REST API"
+          ],
           "experience_level": "mid",
           "label": 1
         },
@@ -624,14 +825,27 @@
       "proposal": {
         "title": "Shopify E-Commerce Developer",
         "description": "Customise and extend a Shopify store — theme development with Liquid, custom app development, third-party integrations (payment gateways, CRM), and performance optimisation.",
-        "required_skills": ["Shopify", "Liquid", "JavaScript", "REST API", "E-Commerce"]
+        "required_skills": [
+          "Shopify",
+          "Liquid",
+          "JavaScript",
+          "REST API",
+          "E-Commerce"
+        ]
       },
       "candidates": [
         {
           "user_id": 1301,
           "headline": "Shopify Expert — Theme & App Development",
           "bio": "5 years Shopify development. Custom Liquid theme development, Shopify app development with Node.js, and payment gateway integrations.",
-          "skills": ["Shopify", "Liquid", "JavaScript", "Node.js", "REST API", "E-Commerce"],
+          "skills": [
+            "Shopify",
+            "Liquid",
+            "JavaScript",
+            "Node.js",
+            "REST API",
+            "E-Commerce"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -675,14 +889,29 @@
       "proposal": {
         "title": "Full-Stack Developer — Next.js & Laravel SaaS",
         "description": "Build a full-stack SaaS application with Next.js frontend (TypeScript, TailwindCSS, App Router) and Laravel API backend. Must handle authentication, multi-tenancy, Stripe billing integration, and responsive design.",
-        "required_skills": ["Next.js", "TypeScript", "Laravel", "PHP", "TailwindCSS", "Stripe"]
+        "required_skills": [
+          "Next.js",
+          "TypeScript",
+          "Laravel",
+          "PHP",
+          "TailwindCSS",
+          "Stripe"
+        ]
       },
       "candidates": [
         {
           "user_id": 1401,
           "headline": "Full-Stack Developer — Next.js & Laravel",
           "bio": "5 years full-stack development with Next.js and Laravel. Built multiple SaaS platforms with Stripe billing and multi-tenancy.",
-          "skills": ["Next.js", "TypeScript", "Laravel", "PHP", "TailwindCSS", "Stripe", "MySQL"],
+          "skills": [
+            "Next.js",
+            "TypeScript",
+            "Laravel",
+            "PHP",
+            "TailwindCSS",
+            "Stripe",
+            "MySQL"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -698,7 +927,13 @@
           "user_id": 1403,
           "headline": "Next.js TypeScript Developer",
           "bio": "3 years Next.js with TypeScript. Some PHP experience but prefers Node backends.",
-          "skills": ["Next.js", "TypeScript", "React", "TailwindCSS", "Node.js"],
+          "skills": [
+            "Next.js",
+            "TypeScript",
+            "React",
+            "TailwindCSS",
+            "Node.js"
+          ],
           "experience_level": "mid",
           "label": 0
         },
@@ -706,7 +941,14 @@
           "user_id": 1404,
           "headline": "Senior Full-Stack Engineer — Next.js & Laravel & Stripe",
           "bio": "4 years building SaaS with Next.js, Laravel, and Stripe integration. Expert in TypeScript and TailwindCSS.",
-          "skills": ["Next.js", "TypeScript", "Laravel", "PHP", "TailwindCSS", "Stripe"],
+          "skills": [
+            "Next.js",
+            "TypeScript",
+            "Laravel",
+            "PHP",
+            "TailwindCSS",
+            "Stripe"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -726,7 +968,13 @@
       "proposal": {
         "title": "Data Visualisation Developer — Power BI & Tableau",
         "description": "Build interactive dashboards and reports using Power BI and Tableau for business stakeholders. Must connect to SQL databases, create custom DAX measures, and deliver self-service BI solutions.",
-        "required_skills": ["Power BI", "Tableau", "SQL", "DAX", "Data Visualisation"]
+        "required_skills": [
+          "Power BI",
+          "Tableau",
+          "SQL",
+          "DAX",
+          "Data Visualisation"
+        ]
       },
       "candidates": [
         {
@@ -777,7 +1025,13 @@
       "proposal": {
         "title": "Flutter Developer — Cross-Platform Mobile App",
         "description": "Build a cross-platform mobile app for iOS and Android using Flutter and Dart. Requires Firebase integration, state management with Riverpod, and RESTful API consumption.",
-        "required_skills": ["Flutter", "Dart", "Firebase", "REST API", "Mobile Development"]
+        "required_skills": [
+          "Flutter",
+          "Dart",
+          "Firebase",
+          "REST API",
+          "Mobile Development"
+        ]
       },
       "candidates": [
         {
@@ -800,7 +1054,13 @@
           "user_id": 1603,
           "headline": "Flutter Developer — 3 Years Experience",
           "bio": "3 years Flutter and Dart. Firebase and REST API integrations.",
-          "skills": ["Flutter", "Dart", "Firebase", "REST API", "Mobile Development"],
+          "skills": [
+            "Flutter",
+            "Dart",
+            "Firebase",
+            "REST API",
+            "Mobile Development"
+          ],
           "experience_level": "mid",
           "label": 1
         },
@@ -828,14 +1088,26 @@
       "proposal": {
         "title": "Graphic Designer — Brand Identity Package",
         "description": "Create a complete brand identity for a startup: logo, colour palette, typography system, business card, letterhead, and brand guidelines document.",
-        "required_skills": ["Logo Design", "Branding", "Adobe Illustrator", "Photoshop", "Typography"]
+        "required_skills": [
+          "Logo Design",
+          "Branding",
+          "Adobe Illustrator",
+          "Photoshop",
+          "Typography"
+        ]
       },
       "candidates": [
         {
           "user_id": 1701,
           "headline": "Brand Identity Designer",
           "bio": "6 years creating brand identities for startups. Expert Illustrator/Photoshop user, specialises in logo design and brand guidelines.",
-          "skills": ["Logo Design", "Branding", "Adobe Illustrator", "Photoshop", "Typography"],
+          "skills": [
+            "Logo Design",
+            "Branding",
+            "Adobe Illustrator",
+            "Photoshop",
+            "Typography"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -851,7 +1123,13 @@
           "user_id": 1703,
           "headline": "Graphic Designer — Logo & Branding",
           "bio": "3 years brand identity design. Illustrator and typography specialist.",
-          "skills": ["Logo Design", "Branding", "Adobe Illustrator", "Typography", "Photoshop"],
+          "skills": [
+            "Logo Design",
+            "Branding",
+            "Adobe Illustrator",
+            "Typography",
+            "Photoshop"
+          ],
           "experience_level": "mid",
           "label": 1
         },
@@ -879,14 +1157,29 @@
       "proposal": {
         "title": "Go (Golang) Backend Developer — High-Performance API",
         "description": "Build a high-performance REST API in Go for a real-time financial data platform. Requires experience with concurrency, PostgreSQL, Redis caching, and gRPC.",
-        "required_skills": ["Go", "Golang", "PostgreSQL", "Redis", "gRPC", "REST API"]
+        "required_skills": [
+          "Go",
+          "Golang",
+          "PostgreSQL",
+          "Redis",
+          "gRPC",
+          "REST API"
+        ]
       },
       "candidates": [
         {
           "user_id": 1801,
           "headline": "Senior Go Developer — Microservices",
           "bio": "5 years Golang microservices. Expert in concurrency, PostgreSQL, Redis, and gRPC.",
-          "skills": ["Go", "Golang", "PostgreSQL", "Redis", "gRPC", "REST API", "Docker"],
+          "skills": [
+            "Go",
+            "Golang",
+            "PostgreSQL",
+            "Redis",
+            "gRPC",
+            "REST API",
+            "Docker"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -930,14 +1223,27 @@
       "proposal": {
         "title": "WordPress Developer — Custom Theme & Plugin",
         "description": "Build a custom WordPress theme from scratch and develop two custom plugins for a news media site. Must understand the WordPress hook system, Gutenberg blocks, and performance optimisation.",
-        "required_skills": ["WordPress", "PHP", "JavaScript", "Gutenberg", "CSS"]
+        "required_skills": [
+          "WordPress",
+          "PHP",
+          "JavaScript",
+          "Gutenberg",
+          "CSS"
+        ]
       },
       "candidates": [
         {
           "user_id": 1901,
           "headline": "Senior WordPress Developer",
           "bio": "7 years WordPress. Custom theme and plugin development, Gutenberg blocks, WP REST API.",
-          "skills": ["WordPress", "PHP", "JavaScript", "Gutenberg", "CSS", "MySQL"],
+          "skills": [
+            "WordPress",
+            "PHP",
+            "JavaScript",
+            "Gutenberg",
+            "CSS",
+            "MySQL"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -981,14 +1287,29 @@
       "proposal": {
         "title": "AWS Solutions Architect — Serverless Architecture",
         "description": "Design and implement a serverless architecture on AWS using Lambda, API Gateway, DynamoDB, and S3. Must implement infrastructure as code with CDK or Terraform and ensure auto-scaling.",
-        "required_skills": ["AWS", "Lambda", "Serverless", "DynamoDB", "Terraform", "API Gateway"]
+        "required_skills": [
+          "AWS",
+          "Lambda",
+          "Serverless",
+          "DynamoDB",
+          "Terraform",
+          "API Gateway"
+        ]
       },
       "candidates": [
         {
           "user_id": 2001,
           "headline": "AWS Architect — Serverless & IaC",
           "bio": "AWS Solutions Architect certified. 6 years building serverless architectures with Lambda, DynamoDB, and CDK/Terraform.",
-          "skills": ["AWS", "Lambda", "Serverless", "DynamoDB", "Terraform", "API Gateway", "CDK"],
+          "skills": [
+            "AWS",
+            "Lambda",
+            "Serverless",
+            "DynamoDB",
+            "Terraform",
+            "API Gateway",
+            "CDK"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -1004,7 +1325,14 @@
           "user_id": 2003,
           "headline": "AWS & Serverless Developer",
           "bio": "3 years AWS serverless. Lambda, API Gateway, DynamoDB, and Terraform deployments.",
-          "skills": ["AWS", "Lambda", "Serverless", "DynamoDB", "API Gateway", "Terraform"],
+          "skills": [
+            "AWS",
+            "Lambda",
+            "Serverless",
+            "DynamoDB",
+            "API Gateway",
+            "Terraform"
+          ],
           "experience_level": "mid",
           "label": 1
         },
@@ -1032,14 +1360,28 @@
       "proposal": {
         "title": "Machine Learning Engineer — Computer Vision",
         "description": "Build a real-time object detection system using YOLO or similar CNN architectures. Must implement model training pipelines, data augmentation, and deploy the model as a REST API.",
-        "required_skills": ["Python", "Computer Vision", "YOLO", "PyTorch", "Deep Learning", "REST API"]
+        "required_skills": [
+          "Python",
+          "Computer Vision",
+          "YOLO",
+          "PyTorch",
+          "Deep Learning",
+          "REST API"
+        ]
       },
       "candidates": [
         {
           "user_id": 2101,
           "headline": "Computer Vision Engineer — YOLO & PyTorch",
           "bio": "4 years computer vision. Trained YOLOv8 and EfficientDet models, deployed as FastAPI services.",
-          "skills": ["Python", "Computer Vision", "YOLO", "PyTorch", "Deep Learning", "REST API"],
+          "skills": [
+            "Python",
+            "Computer Vision",
+            "YOLO",
+            "PyTorch",
+            "Deep Learning",
+            "REST API"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -1055,7 +1397,14 @@
           "user_id": 2103,
           "headline": "ML Engineer — Object Detection & Segmentation",
           "bio": "3 years computer vision ML. YOLO, Mask R-CNN, and PyTorch pipelines with REST API deployment.",
-          "skills": ["Python", "Computer Vision", "YOLO", "PyTorch", "Deep Learning", "REST API"],
+          "skills": [
+            "Python",
+            "Computer Vision",
+            "YOLO",
+            "PyTorch",
+            "Deep Learning",
+            "REST API"
+          ],
           "experience_level": "mid",
           "label": 1
         },
@@ -1083,14 +1432,26 @@
       "proposal": {
         "title": "SEO Specialist — Technical SEO & Content Strategy",
         "description": "Conduct technical SEO audits, implement schema markup, optimise Core Web Vitals, and develop a content strategy to improve organic search rankings.",
-        "required_skills": ["SEO", "Technical SEO", "Google Analytics", "Content Strategy", "Schema Markup"]
+        "required_skills": [
+          "SEO",
+          "Technical SEO",
+          "Google Analytics",
+          "Content Strategy",
+          "Schema Markup"
+        ]
       },
       "candidates": [
         {
           "user_id": 2201,
           "headline": "Senior SEO Specialist",
           "bio": "5 years technical and content SEO. Core Web Vitals optimisation, schema markup implementation, and Google Analytics expert.",
-          "skills": ["SEO", "Technical SEO", "Google Analytics", "Content Strategy", "Schema Markup"],
+          "skills": [
+            "SEO",
+            "Technical SEO",
+            "Google Analytics",
+            "Content Strategy",
+            "Schema Markup"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -1098,7 +1459,12 @@
           "user_id": 2202,
           "headline": "Social Media Manager",
           "bio": "Social media specialist. Not SEO or search-focused.",
-          "skills": ["Social Media", "Instagram", "Facebook Ads", "Content Writing"],
+          "skills": [
+            "Social Media",
+            "Instagram",
+            "Facebook Ads",
+            "Content Writing"
+          ],
           "experience_level": "mid",
           "label": 0
         },
@@ -1106,7 +1472,12 @@
           "user_id": 2203,
           "headline": "SEO & Content Marketing Specialist",
           "bio": "3 years SEO and content strategy. Technical SEO audits and schema markup.",
-          "skills": ["SEO", "Technical SEO", "Content Strategy", "Google Analytics"],
+          "skills": [
+            "SEO",
+            "Technical SEO",
+            "Content Strategy",
+            "Google Analytics"
+          ],
           "experience_level": "mid",
           "label": 1
         },
@@ -1134,14 +1505,26 @@
       "proposal": {
         "title": "Database Administrator — PostgreSQL Performance Tuning",
         "description": "Optimise PostgreSQL database performance, implement query tuning, indexing strategies, replication setup, and backup/recovery procedures for a high-traffic production environment.",
-        "required_skills": ["PostgreSQL", "SQL", "Database Administration", "Query Optimisation", "Replication"]
+        "required_skills": [
+          "PostgreSQL",
+          "SQL",
+          "Database Administration",
+          "Query Optimisation",
+          "Replication"
+        ]
       },
       "candidates": [
         {
           "user_id": 2301,
           "headline": "Senior PostgreSQL DBA",
           "bio": "6 years PostgreSQL administration. Query optimisation, partitioning, replication, and backup strategies for 100M+ row databases.",
-          "skills": ["PostgreSQL", "SQL", "Database Administration", "Query Optimisation", "Replication"],
+          "skills": [
+            "PostgreSQL",
+            "SQL",
+            "Database Administration",
+            "Query Optimisation",
+            "Replication"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -1157,7 +1540,13 @@
           "user_id": 2303,
           "headline": "PostgreSQL & MySQL DBA",
           "bio": "4 years database administration for PostgreSQL and MySQL. Indexing, query plans, and replication.",
-          "skills": ["PostgreSQL", "MySQL", "SQL", "Database Administration", "Query Optimisation"],
+          "skills": [
+            "PostgreSQL",
+            "MySQL",
+            "SQL",
+            "Database Administration",
+            "Query Optimisation"
+          ],
           "experience_level": "mid",
           "label": 1
         },
@@ -1185,14 +1574,28 @@
       "proposal": {
         "title": "Ruby on Rails Developer — SaaS Application",
         "description": "Maintain and extend a Ruby on Rails SaaS application. Add background jobs with Sidekiq, improve test coverage with RSpec, integrate Stripe billing, and deploy on Heroku.",
-        "required_skills": ["Ruby on Rails", "Ruby", "RSpec", "Sidekiq", "PostgreSQL", "Stripe"]
+        "required_skills": [
+          "Ruby on Rails",
+          "Ruby",
+          "RSpec",
+          "Sidekiq",
+          "PostgreSQL",
+          "Stripe"
+        ]
       },
       "candidates": [
         {
           "user_id": 2401,
           "headline": "Senior Ruby on Rails Developer",
           "bio": "7 years Rails. Sidekiq background jobs, RSpec testing, Stripe integration, and Heroku deployments.",
-          "skills": ["Ruby on Rails", "Ruby", "RSpec", "Sidekiq", "PostgreSQL", "Stripe"],
+          "skills": [
+            "Ruby on Rails",
+            "Ruby",
+            "RSpec",
+            "Sidekiq",
+            "PostgreSQL",
+            "Stripe"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -1236,14 +1639,26 @@
       "proposal": {
         "title": "Copywriter — SaaS Product Marketing",
         "description": "Write compelling website copy, email sequences, landing pages, and product descriptions for a B2B SaaS product. Must understand conversion-focused writing and have a tech background.",
-        "required_skills": ["Copywriting", "Content Marketing", "Email Marketing", "Landing Pages", "B2B SaaS"]
+        "required_skills": [
+          "Copywriting",
+          "Content Marketing",
+          "Email Marketing",
+          "Landing Pages",
+          "B2B SaaS"
+        ]
       },
       "candidates": [
         {
           "user_id": 2501,
           "headline": "SaaS Copywriter & Content Strategist",
           "bio": "5 years writing for B2B SaaS companies. Landing pages, email sequences, and product copy that drives conversions.",
-          "skills": ["Copywriting", "Content Marketing", "Email Marketing", "Landing Pages", "B2B SaaS"],
+          "skills": [
+            "Copywriting",
+            "Content Marketing",
+            "Email Marketing",
+            "Landing Pages",
+            "B2B SaaS"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -1259,7 +1674,13 @@
           "user_id": 2503,
           "headline": "B2B Content & Email Marketing Specialist",
           "bio": "3 years B2B SaaS marketing. Email campaigns, landing pages, and conversion copy.",
-          "skills": ["Copywriting", "Email Marketing", "Landing Pages", "Content Marketing", "B2B SaaS"],
+          "skills": [
+            "Copywriting",
+            "Email Marketing",
+            "Landing Pages",
+            "Content Marketing",
+            "B2B SaaS"
+          ],
           "experience_level": "mid",
           "label": 1
         },
@@ -1287,14 +1708,27 @@
       "proposal": {
         "title": "Rust Systems Developer — High-Performance Networking",
         "description": "Build high-performance networking components in Rust for a distributed systems platform. Must be comfortable with async Rust, Tokio, and low-level socket programming.",
-        "required_skills": ["Rust", "Tokio", "Async", "Networking", "Systems Programming"]
+        "required_skills": [
+          "Rust",
+          "Tokio",
+          "Async",
+          "Networking",
+          "Systems Programming"
+        ]
       },
       "candidates": [
         {
           "user_id": 2601,
           "headline": "Senior Rust Systems Developer",
           "bio": "4 years Rust. Expert in async/await with Tokio, networking, and zero-cost abstractions for systems programming.",
-          "skills": ["Rust", "Tokio", "Async", "Networking", "Systems Programming", "Linux"],
+          "skills": [
+            "Rust",
+            "Tokio",
+            "Async",
+            "Networking",
+            "Systems Programming",
+            "Linux"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -1338,14 +1772,29 @@
       "proposal": {
         "title": "Kubernetes Platform Engineer — GitOps & ArgoCD",
         "description": "Manage production Kubernetes clusters. Implement GitOps workflows with ArgoCD, Helm chart management, RBAC policies, and observability with Prometheus and Grafana.",
-        "required_skills": ["Kubernetes", "ArgoCD", "GitOps", "Helm", "Prometheus", "Grafana"]
+        "required_skills": [
+          "Kubernetes",
+          "ArgoCD",
+          "GitOps",
+          "Helm",
+          "Prometheus",
+          "Grafana"
+        ]
       },
       "candidates": [
         {
           "user_id": 2701,
           "headline": "Platform Engineer — Kubernetes & GitOps",
           "bio": "5 years Kubernetes platform engineering. Expert in ArgoCD, Helm, RBAC, Prometheus and Grafana observability stacks.",
-          "skills": ["Kubernetes", "ArgoCD", "GitOps", "Helm", "Prometheus", "Grafana", "Docker"],
+          "skills": [
+            "Kubernetes",
+            "ArgoCD",
+            "GitOps",
+            "Helm",
+            "Prometheus",
+            "Grafana",
+            "Docker"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -1361,7 +1810,14 @@
           "user_id": 2703,
           "headline": "DevOps Engineer — Kubernetes & ArgoCD",
           "bio": "3 years Kubernetes with ArgoCD GitOps, Helm charts, and Prometheus monitoring.",
-          "skills": ["Kubernetes", "ArgoCD", "Helm", "GitOps", "Prometheus", "Grafana"],
+          "skills": [
+            "Kubernetes",
+            "ArgoCD",
+            "Helm",
+            "GitOps",
+            "Prometheus",
+            "Grafana"
+          ],
           "experience_level": "mid",
           "label": 1
         },
@@ -1389,14 +1845,26 @@
       "proposal": {
         "title": "E-Learning Instructional Designer",
         "description": "Design and develop interactive e-learning courses using Articulate Storyline. Create storyboards, record voiceovers, produce SCORM-compliant modules, and measure learner outcomes with xAPI.",
-        "required_skills": ["Instructional Design", "Articulate Storyline", "SCORM", "E-Learning", "xAPI"]
+        "required_skills": [
+          "Instructional Design",
+          "Articulate Storyline",
+          "SCORM",
+          "E-Learning",
+          "xAPI"
+        ]
       },
       "candidates": [
         {
           "user_id": 2801,
           "headline": "Senior Instructional Designer — Articulate Storyline",
           "bio": "6 years e-learning design. Expert in Articulate Storyline, SCORM, xAPI, and LMS integration.",
-          "skills": ["Instructional Design", "Articulate Storyline", "SCORM", "E-Learning", "xAPI"],
+          "skills": [
+            "Instructional Design",
+            "Articulate Storyline",
+            "SCORM",
+            "E-Learning",
+            "xAPI"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -1412,7 +1880,12 @@
           "user_id": 2803,
           "headline": "E-Learning Developer — Storyline & Rise",
           "bio": "3 years e-learning development with Articulate Storyline and Rise. SCORM and xAPI compliant.",
-          "skills": ["Instructional Design", "Articulate Storyline", "SCORM", "E-Learning"],
+          "skills": [
+            "Instructional Design",
+            "Articulate Storyline",
+            "SCORM",
+            "E-Learning"
+          ],
           "experience_level": "mid",
           "label": 1
         },
@@ -1440,14 +1913,27 @@
       "proposal": {
         "title": "Elasticsearch & Kibana Engineer — Search Optimisation",
         "description": "Design and optimise Elasticsearch indices, implement full-text search with custom analysers, build Kibana dashboards, and tune cluster performance for a high-throughput logging system.",
-        "required_skills": ["Elasticsearch", "Kibana", "ELK Stack", "Search Optimisation", "Python"]
+        "required_skills": [
+          "Elasticsearch",
+          "Kibana",
+          "ELK Stack",
+          "Search Optimisation",
+          "Python"
+        ]
       },
       "candidates": [
         {
           "user_id": 2901,
           "headline": "Elasticsearch Engineer — ELK Stack",
           "bio": "5 years Elasticsearch and ELK stack. Custom analysers, Kibana dashboards, and cluster tuning for high-volume log ingestion.",
-          "skills": ["Elasticsearch", "Kibana", "ELK Stack", "Search Optimisation", "Python", "Logstash"],
+          "skills": [
+            "Elasticsearch",
+            "Kibana",
+            "ELK Stack",
+            "Search Optimisation",
+            "Python",
+            "Logstash"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -1463,7 +1949,13 @@
           "user_id": 2903,
           "headline": "Elasticsearch & Python Developer",
           "bio": "3 years Elasticsearch integration in Python applications. Kibana visualisation and index optimisation.",
-          "skills": ["Elasticsearch", "Python", "Kibana", "ELK Stack", "Search Optimisation"],
+          "skills": [
+            "Elasticsearch",
+            "Python",
+            "Kibana",
+            "ELK Stack",
+            "Search Optimisation"
+          ],
           "experience_level": "mid",
           "label": 1
         },
@@ -1491,14 +1983,28 @@
       "proposal": {
         "title": "C# .NET Developer — Azure Microservices",
         "description": "Build and maintain cloud-native microservices using C# .NET 8, Azure Service Bus, Entity Framework Core, and deploy with Azure DevOps pipelines.",
-        "required_skills": ["C#", ".NET", "Azure", "Microservices", "Entity Framework", "Azure DevOps"]
+        "required_skills": [
+          "C#",
+          ".NET",
+          "Azure",
+          "Microservices",
+          "Entity Framework",
+          "Azure DevOps"
+        ]
       },
       "candidates": [
         {
           "user_id": 3001,
           "headline": "Senior C# .NET Developer — Azure",
           "bio": "6 years .NET microservices on Azure. C# .NET 8, Azure Service Bus, EF Core, and Azure DevOps CI/CD.",
-          "skills": ["C#", ".NET", "Azure", "Microservices", "Entity Framework", "Azure DevOps"],
+          "skills": [
+            "C#",
+            ".NET",
+            "Azure",
+            "Microservices",
+            "Entity Framework",
+            "Azure DevOps"
+          ],
           "experience_level": "senior",
           "label": 1
         },
@@ -1514,7 +2020,13 @@
           "user_id": 3003,
           "headline": ".NET & C# Developer — 4 Years",
           "bio": "4 years C# .NET development. Azure and Entity Framework Core.",
-          "skills": ["C#", ".NET", "Azure", "Entity Framework", "Microservices"],
+          "skills": [
+            "C#",
+            ".NET",
+            "Azure",
+            "Entity Framework",
+            "Microservices"
+          ],
           "experience_level": "mid",
           "label": 1
         },

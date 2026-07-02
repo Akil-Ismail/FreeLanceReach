@@ -119,8 +119,8 @@ export default function AIProposalGeneratorPage() {
             AI Proposal Generator
           </h1>
           <p className="text-gray-600 mt-1">
-            Paste a job description and let Gemini AI write a tailored
-            application proposal for you.
+            Paste a job description and let Groq AI write a tailored application
+            proposal for you.
           </p>
         </div>
 
@@ -227,7 +227,7 @@ export default function AIProposalGeneratorPage() {
                 <div className="text-center">
                   <div className="w-10 h-10 border-4 border-gray-200 border-t-red-500 rounded-full animate-spin mx-auto mb-3" />
                   <p className="text-sm text-gray-500">
-                    Gemini AI is writing your proposal...
+                    Groq AI is writing your proposal...
                   </p>
                 </div>
               </div>

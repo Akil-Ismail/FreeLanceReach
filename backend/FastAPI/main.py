@@ -9,7 +9,7 @@ import uvicorn
 
 from app.routers import vectors, health, company_chat, freelancer_chat, matching, proposal_generator, evaluation
 from app.services.vector_service import VectorService
-from app.services.gemini_service import get_gemini_service
+from app.services.groq_service import get_groq_service
 
 # Initialize Vector DB service
 vector_service = VectorService()
@@ -23,9 +23,9 @@ async def lifespan(app: FastAPI):
     vector_service.initialize()
     print("[startup] Vector database initialized.")
 
-    print("[startup] Initializing Gemini AI service...")
-    gemini_service = get_gemini_service()
-    gemini_service.initialize()
+    print("[startup] Initializing Groq AI service...")
+    groq_service = get_groq_service()
+    groq_service.initialize()
 
     yield
 
