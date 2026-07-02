@@ -26,7 +26,7 @@
 
 <br/>
 
-[Features](#-features) · [Screenshots](#-screenshots) · [Architecture](#-architecture) · [Getting Started](#-getting-started) · [API Docs](#-api-reference)
+[Features](#features) · [Screenshots](#screenshots) · [Architecture](#architecture) · [Getting Started](#getting-started) · [API Docs](#api-reference)
 
 </div>
 
