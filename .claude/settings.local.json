@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(php artisan *)",
-      "Bash(dir /S /B \"c:\\\\Users\\\\akili\\\\Desktop\\\\freelance-reach\\\\backend\\\\laravel\\\\my-laravel-app\\\\app\\\\Http\")"
-    ]
-  }
-}
